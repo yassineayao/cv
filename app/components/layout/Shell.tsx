@@ -45,16 +45,16 @@ export function Shell({ children, className, ...props }: ShellProps) {
             )}
             {...props}
         >
-            {/* Navigation Dots */}
-            <div className="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-50">
+            {/* Navigation Dots - Hidden on very small screens, smaller on mobile */}
+            <div className="fixed right-2 md:right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3 z-50 hidden sm:flex">
                 {Array.from({ length: totalSections }).map((_, i) => (
                     <button
                         key={i}
                         onClick={() => scrollToSection(i)}
                         className={cn(
-                            "w-2.5 h-2.5 rounded-full transition-all duration-300 hover:scale-150",
+                            "w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 hover:scale-150",
                             activeSection === i
-                                ? "bg-primary w-8 shadow-glow-primary"
+                                ? "bg-primary w-6 md:w-8 shadow-glow-primary"
                                 : "bg-primary/20 hover:bg-primary/50"
                         )}
                         aria-label={`Go to section ${i + 1}`}

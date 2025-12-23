@@ -32,34 +32,34 @@ export function Cover() {
     };
 
     return (
-        <section className="h-screen w-full snap-start flex flex-col items-center justify-center p-8 border-b-2 bg-gradient-to-b from-background via-background to-muted/20 relative overflow-hidden">
+        <section className="h-screen w-full snap-start flex flex-col items-center justify-center p-4 sm:p-8 border-b-2 bg-gradient-to-b from-background via-background to-muted/20 relative overflow-hidden">
             {/* Enhanced Background with Image */}
             <div className="absolute inset-0 -z-10 opacity-20">
                 <Image src="/assets/cover.png" alt="Cover Illustration" fill className="object-cover" priority />
                 <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/90 backdrop-blur-[2px]"></div>
             </div>
 
-            {/* Floating decorative elements */}
-            <div className="absolute inset-0 -z-10 opacity-10 pointer-events-none">
+            {/* Floating decorative elements - hidden on mobile */}
+            <div className="absolute inset-0 -z-10 opacity-10 pointer-events-none hidden md:block">
                 <Code2 className="absolute top-20 left-20 w-32 h-32 rotate-12 animate-float" />
                 <Database className="absolute bottom-20 right-20 w-40 h-40 -rotate-12 animate-float" style={{ animationDelay: '1s' }} />
                 <Sparkles className="absolute top-1/3 right-1/4 w-24 h-24 animate-pulse-slow" />
             </div>
 
-            <div className="max-w-4xl text-center space-y-8 z-10 relative">
-                <div className="space-y-4">
-                    <h1 className="text-6xl font-extrabold tracking-tight lg:text-9xl text-gradient animate-in fade-in zoom-in duration-1000 font-serif">
+            <div className="max-w-4xl text-center space-y-4 sm:space-y-8 z-10 relative px-2">
+                <div className="space-y-2 sm:space-y-4">
+                    <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight lg:text-9xl text-gradient animate-in fade-in zoom-in duration-1000 font-serif">
                         {config.personal.name}
                     </h1>
-                    <h2 className="text-3xl font-semibold text-muted-foreground animate-in slide-in-from-bottom duration-1000 delay-200">
+                    <h2 className="text-xl sm:text-3xl font-semibold text-muted-foreground animate-in slide-in-from-bottom duration-1000 delay-200">
                         {config.personal.title}
                     </h2>
-                    <p className="text-xl text-muted-foreground/80 animate-in slide-in-from-bottom duration-1000 delay-300">
+                    <p className="text-base sm:text-xl text-muted-foreground/80 animate-in slide-in-from-bottom duration-1000 delay-300">
                         {config.personal.location}
                     </p>
                 </div>
 
-                <div className="flex gap-6 justify-center animate-in fade-in duration-1000 delay-500 flex-wrap">
+                <div className="flex gap-3 sm:gap-6 justify-center animate-in fade-in duration-1000 delay-500 flex-wrap">
                     {config.skills.featured.map((skill, index) => (
                         <div key={skill} className="animate-float" style={{ animationDelay: `${index * 0.5}s` }}>
                             <InteractiveIcon icon={skillIcons[skill] || Server} label={skill} />
@@ -67,10 +67,10 @@ export function Cover() {
                     ))}
                 </div>
 
-                <div className="flex gap-4 justify-center pt-8 animate-in fade-in duration-1000 delay-700">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-8 animate-in fade-in duration-1000 delay-700">
                     <Button
                         size="lg"
-                        className="rounded-full px-8 text-lg font-bold shadow-glow-primary hover:shadow-glow transition-all"
+                        className="rounded-full px-6 sm:px-8 text-base sm:text-lg font-bold shadow-glow-primary hover:shadow-glow transition-all"
                         onClick={() => scrollToChapter(1)}
                     >
                         Start the Story
@@ -78,7 +78,7 @@ export function Cover() {
                     <Button
                         variant="outline"
                         size="lg"
-                        className="rounded-full px-8 text-lg hover:bg-primary/10 transition-all"
+                        className="rounded-full px-6 sm:px-8 text-base sm:text-lg hover:bg-primary/10 transition-all"
                         onClick={scrollToContact}
                     >
                         Contact Me
