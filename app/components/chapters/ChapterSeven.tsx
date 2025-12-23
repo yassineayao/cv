@@ -3,21 +3,13 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Github, Mail, Globe, ArrowRight, Download } from "lucide-react";
-
-// Configuration - Update these with your actual links
-const CONTACT_LINKS = {
-    upwork: "https://www.upwork.com/freelancers/~01f9823dc543971585",
-    github: "https://github.com/yassineayao",
-    email: "yassineayaou@gmail.com",
-    resumeUrl: "/resume.pdf" // Place your resume in /public/resume.pdf
-};
+import { config } from "@/lib/config";
 
 export function ChapterSeven() {
     const handleDownloadResume = () => {
-        // Create a link element and trigger download
         const link = document.createElement('a');
-        link.href = CONTACT_LINKS.resumeUrl;
-        link.download = 'Yassine_Resume.pdf';
+        link.href = config.contact.resumeUrl;
+        link.download = `${config.personal.name}_Resume.pdf`;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
@@ -31,16 +23,16 @@ export function ChapterSeven() {
                 <div className="space-y-4">
                     <h3 className="text-sm font-bold text-primary tracking-widest uppercase mb-2">Final Chapter</h3>
                     <h2 className="text-5xl font-extrabold tracking-tight lg:text-7xl font-serif">
-                        Reach Out to the Hero
+                        {config.contactPage.title}
                     </h2>
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        If you want to see my quests in action or recruit me for a new adventure:
+                        {config.contactPage.description}
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mx-auto">
                     <a
-                        href={CONTACT_LINKS.upwork}
+                        href={config.contact.upwork}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group bg-card p-8 rounded-2xl border hover:border-primary/50 transition-all hover:-translate-y-2 flex flex-col items-center gap-4 shadow-lg hover:shadow-glow-primary"
@@ -55,7 +47,7 @@ export function ChapterSeven() {
                     </a>
 
                     <a
-                        href={CONTACT_LINKS.github}
+                        href={config.contact.github}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group bg-card p-8 rounded-2xl border hover:border-primary/50 transition-all hover:-translate-y-2 flex flex-col items-center gap-4 shadow-lg hover:shadow-glow-primary"
@@ -70,7 +62,7 @@ export function ChapterSeven() {
                     </a>
 
                     <a
-                        href={`mailto:${CONTACT_LINKS.email}`}
+                        href={`mailto:${config.contact.email}`}
                         className="group bg-card p-8 rounded-2xl border hover:border-primary/50 transition-all hover:-translate-y-2 flex flex-col items-center gap-4 shadow-lg hover:shadow-glow-primary"
                     >
                         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -98,3 +90,4 @@ export function ChapterSeven() {
         </section>
     );
 }
+

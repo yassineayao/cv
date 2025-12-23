@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { InteractiveIcon } from "@/components/ui/interactive-icon";
 import { Server, Database, LayoutTemplate, Container, Code2, Sparkles } from "lucide-react";
+import { config } from "@/lib/config";
 
 export function Cover() {
     const scrollToChapter = (sectionIndex: number) => {
@@ -19,7 +20,15 @@ export function Cover() {
     };
 
     const scrollToContact = () => {
-        scrollToChapter(7); // Chapter 7 is the contact section (index 7)
+        scrollToChapter(7);
+    };
+
+    // Map skill names to icons
+    const skillIcons: Record<string, typeof Server> = {
+        "Node.js": Server,
+        "Next.js": LayoutTemplate,
+        "PostgreSQL": Database,
+        "Docker": Container,
     };
 
     return (
@@ -40,29 +49,22 @@ export function Cover() {
             <div className="max-w-4xl text-center space-y-8 z-10 relative">
                 <div className="space-y-4">
                     <h1 className="text-6xl font-extrabold tracking-tight lg:text-9xl text-gradient animate-in fade-in zoom-in duration-1000 font-serif">
-                        Yassine
+                        {config.personal.name}
                     </h1>
                     <h2 className="text-3xl font-semibold text-muted-foreground animate-in slide-in-from-bottom duration-1000 delay-200">
-                        Full-Stack Developer
+                        {config.personal.title}
                     </h2>
                     <p className="text-xl text-muted-foreground/80 animate-in slide-in-from-bottom duration-1000 delay-300">
-                        Taroudant / Remote
+                        {config.personal.location}
                     </p>
                 </div>
 
                 <div className="flex gap-6 justify-center animate-in fade-in duration-1000 delay-500 flex-wrap">
-                    <div className="animate-float" style={{ animationDelay: '0s' }}>
-                        <InteractiveIcon icon={Server} label="Node.js" />
-                    </div>
-                    <div className="animate-float" style={{ animationDelay: '0.5s' }}>
-                        <InteractiveIcon icon={LayoutTemplate} label="Next.js" />
-                    </div>
-                    <div className="animate-float" style={{ animationDelay: '1s' }}>
-                        <InteractiveIcon icon={Database} label="PostgreSQL" />
-                    </div>
-                    <div className="animate-float" style={{ animationDelay: '1.5s' }}>
-                        <InteractiveIcon icon={Container} label="Docker" />
-                    </div>
+                    {config.skills.featured.map((skill, index) => (
+                        <div key={skill} className="animate-float" style={{ animationDelay: `${index * 0.5}s` }}>
+                            <InteractiveIcon icon={skillIcons[skill] || Server} label={skill} />
+                        </div>
+                    ))}
                 </div>
 
                 <div className="flex gap-4 justify-center pt-8 animate-in fade-in duration-1000 delay-700">

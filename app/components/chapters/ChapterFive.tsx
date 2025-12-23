@@ -2,7 +2,8 @@
 import React from "react";
 import Image from "next/image";
 import { StoryCard } from "@/components/ui/story-card";
-import { Trophy, Scroll, Star, Award, Medal } from "lucide-react";
+import { Star, Award } from "lucide-react";
+import { config } from "@/lib/config";
 
 export function ChapterFive() {
     return (
@@ -22,23 +23,17 @@ export function ChapterFive() {
             <div className="flex-1 max-w-xl p-8 animate-in slide-in-from-left duration-700 delay-200">
                 <div className="mb-6">
                     <h3 className="text-sm font-bold text-primary tracking-widest uppercase mb-2">Chapter 5</h3>
-                    <h2 className="text-4xl font-extrabold mb-4">Achievements</h2>
+                    <h2 className="text-4xl font-extrabold mb-4">{config.achievements.title}</h2>
                 </div>
 
-                <StoryCard title="Quests Completed">
+                <StoryCard title={config.achievements.subtitle}>
                     <ul className="space-y-4 text-lg text-muted-foreground">
-                        <li className="flex gap-3">
-                            <Star className="w-6 h-6 text-yellow-500 shrink-0 mt-1" />
-                            <span>Worked directly with clients, translating vague ideas into robust technical solutions.</span>
-                        </li>
-                        <li className="flex gap-3">
-                            <Star className="w-6 h-6 text-yellow-500 shrink-0 mt-1" />
-                            <span>Made key architectural decisions solo, ensuring scalability and maintainability.</span>
-                        </li>
-                        <li className="flex gap-3">
-                            <Star className="w-6 h-6 text-yellow-500 shrink-0 mt-1" />
-                            <span>Maintained long-term relationships and projects after initial delivery.</span>
-                        </li>
+                        {config.achievements.items.map((achievement, index) => (
+                            <li key={index} className="flex gap-3">
+                                <Star className="w-6 h-6 text-yellow-500 shrink-0 mt-1" />
+                                <span>{achievement}</span>
+                            </li>
+                        ))}
                     </ul>
                 </StoryCard>
             </div>
