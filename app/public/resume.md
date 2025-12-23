@@ -1,94 +1,123 @@
-# Yassine Ayaou
+# YASSINE AYAOU
 
-**Full-Stack Developer**  
-Taroudant, Morocco | Remote
-
-📧 yassineayaou@gmail.com  
-🔗 [GitHub](https://github.com/yassineayao)  
-💼 [Upwork](https://www.upwork.com/freelancers/~01f9823dc543971585)
+**Full-Stack Developer**
 
 ---
 
-## Summary
+### Contact
 
-Self-taught Full-Stack Developer with 5+ years of experience building web applications from scratch. Specialized in Node.js, Next.js, and PostgreSQL with a focus on clean architecture and scalable solutions. Strong track record of delivering end-to-end projects as an independent freelancer, from API design to deployment.
-
----
-
-## Technical Skills
-
-**Backend**
-- Node.js, Express, NestJS
-- PostgreSQL, Prisma ORM
-- REST API Design
-- Domain Driven Design (DDD)
-- Server Actions
-
-**Frontend**
-- Next.js (App Router)
-- React, TypeScript
-- Tailwind CSS, Shadcn UI
-- React Hook Form
-- Framer Motion
-
-**Mobile**
-- Expo / React Native
-
-**DevOps & Tools**
-- Docker, Docker Compose
-- VPS Deployment
-- Git, GitHub
-- Auth.js
+| | |
+|---|---|
+| **Location** | Taroudant, Morocco (Remote) |
+| **Email** | yassineayaou@gmail.com |
+| **GitHub** | [github.com/yassineayao](https://github.com/yassineayao) |
+| **Upwork** | [upwork.com/freelancers/~01f9823dc543971585](https://www.upwork.com/freelancers/~01f9823dc543971585) |
 
 ---
 
-## Experience
+## Professional Summary
+
+Results-driven Full-Stack Developer with **5+ years** of experience architecting and delivering web applications from concept to production. Specialized in the **Node.js ecosystem** with expertise in Next.js, PostgreSQL, and containerized deployments. Proven track record of translating complex business requirements into scalable, maintainable solutions while working independently with international clients.
+
+---
+
+## Core Competencies
+
+| Backend | Frontend | Mobile & DevOps |
+|---------|----------|-----------------|
+| Node.js / Express | Next.js (App Router) | Expo / React Native |
+| PostgreSQL / Prisma ORM | React / TypeScript | Docker / Docker Compose |
+| REST API Design | Tailwind CSS / Shadcn UI | VPS Deployment |
+| Domain Driven Design (DDD) | React Hook Form | Git / GitHub |
+| Server Actions | Framer Motion | Auth.js |
+
+---
+
+## Professional Experience
 
 ### Freelance Full-Stack Developer
-**Self-Employed** | 2018 – Present
+**Self-Employed** — *2019 – Present*
 
-- Handled full-stack projects end-to-end, from API design to frontend implementation
-- Managed deployment using Docker on VPS servers
-- Worked directly with clients, translating vague ideas into robust technical solutions
-- Made key architectural decisions solo, ensuring scalability and maintainability
-- Maintained long-term relationships and projects after initial delivery
+> Delivering end-to-end web solutions for international clients, from initial concept through deployment and ongoing maintenance.
 
-**Key Technologies:** Node.js, Express, PostgreSQL, Next.js, React, Tailwind CSS, Docker
+**Key Responsibilities & Achievements:**
+- Developed full-stack applications handling complete product lifecycles
+- Deployed and maintained production environments using Docker on VPS infrastructure
+- Collaborated directly with clients to transform business ideas into technical specifications
+- Made autonomous architectural decisions ensuring long-term scalability and code quality
+- Built lasting client relationships through reliable delivery and post-launch support
+
+**Tech Stack:** `Node.js` `Express` `PostgreSQL` `Next.js` `React` `Tailwind CSS` `Docker`
 
 ---
 
-### Current Project: Tourism Tips Management App
-**Full-Stack Developer** | Ongoing
+### Research Developer *(Remote)*
+**BlueRidge** — *March 2018 – January 2019*
 
-- Developing a complete tips management application for a tourism agency
-- Managing the full product lifecycle from A to Z
-- Implementing Domain Driven Design to solve scalability challenges
-- Building both web dashboard (Next.js) and mobile app (Expo)
+> Developed a real-time 3D reconstruction system that generates three-dimensional models from video input as users capture objects from multiple angles.
 
-**Stack:** Node.js, Next.js, PostgreSQL, Docker, Expo
+**Key Contributions:**
+- Researched and implemented cutting-edge algorithms from academic papers on 3D reconstruction and computer vision
+- Engineered core modules for real-time point cloud generation and mesh reconstruction
+- Optimized processing pipelines to achieve real-time performance on consumer-grade hardware
+
+**Tech Stack:** `Computer Vision` `3D Reconstruction` `Real-time Processing` `C++` `Python`
+
+---
+
+### Research Developer *(Remote)*
+**BlueRidge** — *June 2017 – March 2018*
+
+> Built an automated geometry analysis system for shoe last models used in footwear manufacturing, extracting precise measurements from 3D scans.
+
+**Key Contributions:**
+- Developed algorithms for automatic sole detection and boundary extraction from 3D mesh data
+- Implemented heel region identification and geometric feature extraction
+- Created analysis pipelines that significantly reduced manual measurement time
+
+**Tech Stack:** `3D Geometry Processing` `Algorithm Development` `CAD Analysis` `Python`
+
+---
+
+## Current Project
+
+### Tourism Trips Management Application
+**Full-Stack Developer** — *Ongoing*
+
+Building a comprehensive trips management platform for a tourism agency, managing the complete product lifecycle from requirements gathering to deployment.
+
+**Highlights:**
+- Implementing **Domain Driven Design** to address complex business logic and scalability requirements
+- Developing a responsive **web dashboard** (Next.js) for agency management
+- Building a **mobile application** (Expo) for field staff
+
+**Tech Stack:** `Node.js` `Next.js` `PostgreSQL` `Docker` `Expo` `React Native`
 
 ---
 
 ## Education
 
 ### Master's Degree in Computer Science
-**Faculty of Sciences, Sidi Mohamed Ben Abdellah University** | Fez, Morocco | 2016
+**Faculty of Sciences, Sidi Mohamed Ben Abdellah University**  
+*Fez, Morocco — 2016*
 
-Combining academic foundations with self-taught agility to solve complex problems.
-
----
-
-## Key Achievements
-
-- Successfully delivered multiple freelance projects from concept to production
-- Built expertise in modern JavaScript ecosystem through continuous self-learning since 2018
-- Developed strong client communication skills, translating business needs into technical solutions
-- Established reputation for maintaining projects and providing ongoing support
+Combining rigorous academic foundations with self-taught adaptability to solve complex technical challenges.
 
 ---
 
 ## Languages
 
-- Arabic (Native)
-- English (Professional)
-- French (Professional)
+| Language | Proficiency |
+|----------|-------------|
+| Arabic | Native |
+| English | Professional |
+| French | Professional |
+
+---
+
+## Key Achievements
+
+- ✓ Successfully delivered **multiple freelance projects** from concept to production
+- ✓ Built deep expertise in the **modern JavaScript ecosystem** through continuous learning since 2018
+- ✓ Developed strong **client communication skills**, bridging business needs and technical solutions
+- ✓ Established a reputation for **reliability** and providing ongoing project support
