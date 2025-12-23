@@ -1,3 +1,4 @@
+"use client";
 
 import React from "react";
 import Image from "next/image";
@@ -6,6 +7,21 @@ import { InteractiveIcon } from "@/components/ui/interactive-icon";
 import { Server, Database, LayoutTemplate, Container, Code2, Sparkles } from "lucide-react";
 
 export function Cover() {
+    const scrollToChapter = (sectionIndex: number) => {
+        const container = document.querySelector('[data-scroll-container]');
+        if (container) {
+            const sectionHeight = container.scrollHeight / 8;
+            container.scrollTo({
+                top: sectionHeight * sectionIndex,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const scrollToContact = () => {
+        scrollToChapter(7); // Chapter 7 is the contact section (index 7)
+    };
+
     return (
         <section className="h-screen w-full snap-start flex flex-col items-center justify-center p-8 border-b-2 bg-gradient-to-b from-background via-background to-muted/20 relative overflow-hidden">
             {/* Enhanced Background with Image */}
@@ -50,10 +66,19 @@ export function Cover() {
                 </div>
 
                 <div className="flex gap-4 justify-center pt-8 animate-in fade-in duration-1000 delay-700">
-                    <Button size="lg" className="rounded-full px-8 text-lg font-bold shadow-glow-primary hover:shadow-glow transition-all">
+                    <Button
+                        size="lg"
+                        className="rounded-full px-8 text-lg font-bold shadow-glow-primary hover:shadow-glow transition-all"
+                        onClick={() => scrollToChapter(1)}
+                    >
                         Start the Story
                     </Button>
-                    <Button variant="outline" size="lg" className="rounded-full px-8 text-lg hover:bg-primary/10 transition-all">
+                    <Button
+                        variant="outline"
+                        size="lg"
+                        className="rounded-full px-8 text-lg hover:bg-primary/10 transition-all"
+                        onClick={scrollToContact}
+                    >
                         Contact Me
                     </Button>
                 </div>
