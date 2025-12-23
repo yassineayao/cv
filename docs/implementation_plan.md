@@ -5,7 +5,7 @@ This document outlines the step-by-step implementation plan for the Storybook CV
 ## Phase 1: Project Setup & Infrastructure
 
 1.  **Initialize Next.js Project**
-    *   Create a new Next.js project using `create-next-app`.
+    *   Create a new Next.js project using `create-next-app` in a subdirectory named `app`.
     *   Configuration:
         *   TypeScript: Yes
         *   Tailwind CSS: Yes
