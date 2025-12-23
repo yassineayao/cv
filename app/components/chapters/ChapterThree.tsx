@@ -1,5 +1,6 @@
 
 import React from "react";
+import Image from "next/image";
 import { StoryCard } from "@/components/ui/story-card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Box, Wand2, Database, Layout, Server, Lock, Smartphone } from "lucide-react";
@@ -25,16 +26,13 @@ export function ChapterThree() {
 
             <div className="flex-1 flex justify-center p-8 animate-in zoom-in duration-700">
                 {/* Visual: Magic Chest */}
-                <div className="relative group">
-                    <div className="w-64 h-48 bg-amber-900/80 rounded-lg shadow-2xl flex items-end justify-center pb-4 border-4 border-amber-700 relative overflow-visible transform transition-transform group-hover:scale-105">
-                        <div className="absolute -top-10 w-64 h-24 bg-amber-800 rounded-t-full border-4 border-amber-700 origin-bottom transition-transform duration-500 group-hover:-rotate-12 z-10 flex items-center justify-center">
-                            <div className="w-8 h-8 rounded-full bg-yellow-500 shadow-glow"></div>
-                        </div>
-                        <div className="text-amber-100 font-serif text-xl tracking-widest opacity-50 group-hover:opacity-100 transition-opacity">SKILLS</div>
+                <div className="relative group w-80 h-80">
+                    <div className="absolute inset-0 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/50">
+                        <Image src="/assets/chapter3.png" alt="Skills Chest" fill className="object-cover" />
                     </div>
 
-                    {/* Floating Skills coming out of chest */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
+                    {/* Floating Skills overlay */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-10">
                         {skills.map((skill, i) => (
                             <div key={skill.name}
                                 className="absolute opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"

@@ -1,5 +1,6 @@
 
 import React from "react";
+import Image from "next/image";
 import { StoryCard } from "@/components/ui/story-card";
 import { GitBranch, Database, ShieldCheck, Smartphone, Globe, ArrowDown, Users } from "lucide-react";
 
@@ -25,50 +26,9 @@ export function ChapterFour() {
             </div>
 
             <div className="flex-1 flex justify-center p-8 animate-in slide-in-from-right duration-700 delay-200">
-                {/* Visual: Architecture Diagram */}
-                <div className="relative w-full max-w-md p-6 bg-muted/10 rounded-xl border border-dashed border-primary/20">
-                    <div className="absolute -top-3 left-6 px-2 bg-background text-xs font-mono text-muted-foreground">System Architecture</div>
-
-                    <div className="grid grid-cols-2 gap-4 text-center">
-                        {/* Mobile App */}
-                        <div className="col-span-1 p-3 bg-card rounded shadow-sm border border-border flex flex-col items-center gap-2">
-                            <Smartphone className="w-6 h-6 text-primary" />
-                            <span className="text-xs font-bold">Expo Mobile</span>
-                        </div>
-                        {/* Admin Panel */}
-                        <div className="col-span-1 p-3 bg-card rounded shadow-sm border border-border flex flex-col items-center gap-2">
-                            <Globe className="w-6 h-6 text-primary" />
-                            <span className="text-xs font-bold">Next.js Admin</span>
-                        </div>
-
-                        {/* Arrows */}
-                        <div className="col-span-2 flex justify-center py-2">
-                            <ArrowDown className="w-4 h-4 text-muted-foreground animate-bounce" />
-                        </div>
-
-                        {/* Backend */}
-                        <div className="col-span-2 p-4 bg-primary/5 rounded border border-primary/20 flex flex-col gap-2">
-                            <div className="flex items-center justify-center gap-2 mb-2">
-                                <ShieldCheck className="w-4 h-4" />
-                                <span className="text-sm font-bold uppercase tracking-wider">Core API (Node.js)</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="p-2 bg-background rounded text-xs border">DDD Modules</div>
-                                <div className="p-2 bg-background rounded text-xs border">Auth Domain</div>
-                            </div>
-                        </div>
-
-                        {/* Arrows */}
-                        <div className="col-span-2 flex justify-center py-2">
-                            <ArrowDown className="w-4 h-4 text-muted-foreground" />
-                        </div>
-
-                        {/* DB */}
-                        <div className="col-span-2 p-3 bg-card rounded shadow-sm border border-border flex items-center justify-center gap-2">
-                            <Database className="w-5 h-5 text-blue-500" />
-                            <span className="text-xs font-bold">PostgreSQL + Redis</span>
-                        </div>
-                    </div>
+                {/* Visual: Architecture Map Illustration */}
+                <div className="relative w-full max-w-lg aspect-[4/3] rounded-xl shadow-2xl overflow-hidden border-8 border-amber-900/40 bg-amber-100">
+                    <Image src="/assets/chapter4.png" alt="Architecture Map" fill className="object-cover" />
                 </div>
             </div>
         </section>

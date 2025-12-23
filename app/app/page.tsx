@@ -8,18 +8,22 @@ import { ChapterFour } from "@/components/chapters/ChapterFour";
 import { ChapterFive } from "@/components/chapters/ChapterFive";
 import { ChapterSix } from "@/components/chapters/ChapterSix";
 import { ChapterSeven } from "@/components/chapters/ChapterSeven";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Home() {
   return (
-    <Shell>
-      <Cover />
-      <ChapterOne />
-      <ChapterTwo />
-      <ChapterThree />
-      <ChapterFour />
-      <ChapterFive />
-      <ChapterSix />
-      <ChapterSeven />
-    </Shell>
+    <>
+      <ThemeToggle />
+      <Shell>
+        <Cover />
+        <ChapterOne />
+        <ChapterTwo />
+        <ChapterThree />
+        <ChapterFour />
+        <ChapterFive />
+        <ChapterSix />
+        <ChapterSeven />
+      </Shell>
+    </>
   );
 }

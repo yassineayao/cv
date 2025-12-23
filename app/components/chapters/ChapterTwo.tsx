@@ -1,5 +1,6 @@
 
 import React from "react";
+import Image from "next/image";
 import { StoryCard } from "@/components/ui/story-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,19 +17,8 @@ export function ChapterTwo() {
             </div>
 
             <div className="flex-1 flex justify-center p-8 animate-in slide-in-from-right duration-700">
-                {/* Visual: Bridge building or deployment */}
-                <div className="relative w-full max-w-sm aspect-square bg-muted/20 rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center group overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-32 h-1 bg-primary/20 rotate-45 transform translate-y-12"></div>
-                        <div className="w-32 h-1 bg-primary/20 -rotate-45 transform -translate-y-12"></div>
-                    </div>
-
-                    <div className="z-10 text-center space-y-4">
-                        <Rocket className="w-16 h-16 mx-auto text-primary animate-pulse" />
-                        <Button variant="default" className="w-full">
-                            Deploy <span className="ml-2 font-mono text-xs opacity-70">git push</span>
-                        </Button>
-                    </div>
+                <div className="relative w-full max-w-sm aspect-square rounded-xl shadow-2xl border-4 border-white overflow-hidden transform -rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <Image src="/assets/chapter2.png" alt="Freelance Quests" fill className="object-cover" />
                 </div>
             </div>
 
