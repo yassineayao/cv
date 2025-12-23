@@ -24,8 +24,8 @@ export function ChapterSix() {
                         </div>
                         <div>
                             <h3 className="text-xl font-bold">Master’s Degree in Computer Science</h3>
-                            <p className="text-muted-foreground text-lg">[University Name]</p>
-                            <p className="text-sm text-muted-foreground mt-1">[Years]</p>
+                            <p className="text-muted-foreground text-lg">Faculty of Sciences, Sidi Mohamed Ben Abdellah University</p>
+                            <p className="text-sm text-muted-foreground mt-1">Fez, Morocco | 2016</p>
                         </div>
                     </div>
                     <p className="mt-6 text-muted-foreground leading-relaxed">
