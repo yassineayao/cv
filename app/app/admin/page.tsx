@@ -12,7 +12,8 @@ import {
     ArrowLeft,
     Plus,
     Eye,
-    X
+    X,
+    LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -40,6 +42,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const router = useRouter();
 
     // Preview state
     const [previewContent, setPreviewContent] = useState<string | null>(null);
@@ -128,6 +131,11 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleLogout = () => {
+        document.cookie = "auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        router.push("/login");
+    };
+
     return (
         <div className="min-h-screen bg-background p-6 font-sans relative">
             <div className="max-w-5xl mx-auto space-y-8">
@@ -142,7 +150,7 @@ export default function AdminDashboard() {
                             Knowledge Base Admin
                         </h1>
                     </div>
-                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
                         <input
                             type="file"
                             id="file-upload"
@@ -171,6 +179,15 @@ export default function AdminDashboard() {
                         >
                             {actionLoading === 'ingest-all' ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
                             Sync All
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleLogout}
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            title="Log Out"
+                        >
+                            <LogOut className="w-5 h-5" />
                         </Button>
                     </div>
                 </div>
@@ -225,8 +242,8 @@ export default function AdminDashboard() {
                             <thead className="bg-muted/10 text-muted-foreground text-xs uppercase tracking-wider">
                                 <tr>
                                     <th className="px-6 py-4 font-semibold">Filename</th>
-                                    <th className="px-6 py-4 font-semibold">Type</th>
-                                    <th className="px-6 py-4 font-semibold">Chunks</th>
+                                    <th className="px-6 py-4 font-semibold hidden md:table-cell">Type</th>
+                                    <th className="px-6 py-4 font-semibold hidden sm:table-cell">Chunks</th>
                                     <th className="px-6 py-4 font-semibold text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -247,24 +264,24 @@ export default function AdminDashboard() {
                                 ) : (
                                     sources.map((source) => (
                                         <tr key={source.filename} className="hover:bg-muted/10 transition-colors group">
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <FileText className="w-4 h-4 text-primary opacity-60" />
-                                                    <span className="font-medium text-sm">{source.filename}</span>
+                                            <td className="px-6 py-4 max-w-[150px] sm:max-w-none">
+                                                <div className="flex items-center gap-2 overflow-hidden">
+                                                    <FileText className="w-4 h-4 text-primary opacity-60 shrink-0" />
+                                                    <span className="font-medium text-sm truncate">{source.filename}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-4 hidden md:table-cell">
                                                 <Badge variant="secondary" className="text-[10px] uppercase font-bold py-0 h-5">
                                                     {source.sourceType}
                                                 </Badge>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-4 hidden sm:table-cell">
                                                 <span className="text-sm font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground border">
                                                     {source.count}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex justify-end gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"

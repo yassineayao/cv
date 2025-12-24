@@ -1,4 +1,3 @@
-
 import { Shell } from "@/components/layout/Shell";
 import { Cover } from "@/components/chapters/Cover";
 import { ChapterOne } from "@/components/chapters/ChapterOne";
@@ -10,11 +9,20 @@ import { ChapterSix } from "@/components/chapters/ChapterSix";
 import { ChapterSeven } from "@/components/chapters/ChapterSeven";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ChatBot } from "@/components/layout/ChatBot";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <>
       <ThemeToggle />
+      <Link
+        href="/admin"
+        className="fixed top-4 left-4 z-50 p-2 rounded-full border bg-background/50 backdrop-blur-sm shadow-lg hover:shadow-glow-primary transition-all text-muted-foreground hover:text-primary group"
+        title="Admin Dashboard"
+      >
+        <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform" />
+      </Link>
       <ChatBot />
       <Shell>
         <Cover />
