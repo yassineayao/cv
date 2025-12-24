@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 model User {
@@ -71,4 +72,31 @@ model Visit {
   os        String?
 
   @@index([timestamp])
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  // User Metadata
+  ip        String?
+  country   String?
+  city      String?
+  region    String?
+  device    String?
+  browser   String?
+  os        String?
+
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  role      String      // "user" | "assistant"
+  content   String      @db.Text
+  
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
 }

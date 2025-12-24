@@ -3,16 +3,56 @@ import { streamText, UIMessage, convertToModelMessages } from 'ai';
 import { retrieveContext } from '@/lib/rag/retrieve';
 import { RAG_CONFIG } from '@/lib/rag/config';
 import { config } from '@/lib/config';
+import { prisma } from '@/lib/prisma';
+import { getVisitMetadata } from '@/lib/analytics';
+import { headers } from 'next/headers';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const { messages, sessionId }: { messages: UIMessage[], sessionId?: string } = await req.json();
   const lastMessage = messages[messages.length - 1];
 
   // Extract text from the last message
   const textPart = lastMessage.parts?.find((part: any) => part.type === 'text') as any;
   const lastMessageText = textPart?.text || '';
+
+  // 0. Log Session and User Message
+  if (sessionId) {
+    try {
+      // Get visitor metadata (IP, location, etc)
+      const metadata = await getVisitMetadata('/api/chat');
+
+      // Upsert session to ensure we capture latest metadata
+      await prisma.chatSession.upsert({
+        where: { id: sessionId },
+        create: {
+          id: sessionId,
+          ip: metadata.ip,
+          country: metadata.country,
+          city: metadata.city,
+          region: metadata.region,
+          device: metadata.device,
+          browser: metadata.browser,
+          os: metadata.os,
+        },
+        update: {
+          updatedAt: new Date(),
+        }
+      });
+
+      // Log User Message
+      await prisma.chatMessage.create({
+        data: {
+          sessionId,
+          role: 'user',
+          content: lastMessageText,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to log chat interaction:", error);
+    }
+  }
 
   // 1. Retrieve Context
   console.log(`Retrieving context for: "${lastMessageText}"`);
@@ -65,6 +105,21 @@ Remember: You ARE Yassine. Respond naturally as if having a conversation with a 
     model: google(RAG_CONFIG.model.name),
     system: systemPrompt,
     messages: await convertToModelMessages(messages),
+    onFinish: async (event) => {
+      if (sessionId && event.text) {
+        try {
+          await prisma.chatMessage.create({
+            data: {
+              sessionId,
+              role: 'assistant',
+              content: event.text,
+            },
+          });
+        } catch (e) {
+          console.error("Failed to log assistant response:", e);
+        }
+      }
+    }
   });
 
   return result.toUIMessageStreamResponse();

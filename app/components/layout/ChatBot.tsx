@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import { v4 as uuidv4 } from 'uuid';
 
 const SUGGESTED_PROMPTS = [
     "What are your main skills?",
@@ -21,7 +22,24 @@ export function ChatBot() {
     const [localInput, setLocalInput] = useState("");
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const { messages, sendMessage, isLoading } = useChat() as any;
+
+    // Generate session ID once on mount
+    const [sessionId] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('chatSessionId') || uuidv4();
+        }
+        return '';
+    });
+
+    useEffect(() => {
+        if (sessionId) {
+            localStorage.setItem('chatSessionId', sessionId);
+        }
+    }, [sessionId]);
+
+    const { messages, sendMessage, isLoading } = useChat({
+        body: { sessionId }
+    } as any) as any;
     const [showPulse, setShowPulse] = useState(true);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
