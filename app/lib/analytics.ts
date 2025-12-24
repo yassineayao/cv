@@ -18,12 +18,7 @@ export async function getVisitMetadata(path: string): Promise<VisitInfo> {
     const headersList = await headers();
 
     // IP Extraction
-    let ip = headersList.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
-
-    // Development Fallback: Use a mock IP if on localhost to test geo-tracking
-    if (process.env.NODE_ENV === "development" && (ip === "127.0.0.1" || ip === "::1" || ip.includes("::ffff:127.0.0.1"))) {
-        ip = "8.8.8.8"; // Google Public DNS IP for testing
-    }
+    const ip = headersList.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
 
     // User Agent
     const ua = headersList.get("user-agent") || "";

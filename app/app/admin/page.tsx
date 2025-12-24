@@ -14,7 +14,8 @@ import {
     Eye,
     X,
     LogOut,
-    Bot
+    Bot,
+    Search
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
     const [analyticsLoading, setAnalyticsLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
     const router = useRouter();
 
     // Preview state
@@ -425,11 +427,29 @@ export default function AdminDashboard() {
 
                         {/* Analytics Table */}
                         <Card className="overflow-hidden border-primary/10 shadow-xl bg-card/50 backdrop-blur-sm">
-                            <div className="p-6 border-b bg-muted/20">
+                            <div className="p-6 border-b bg-muted/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                 <h2 className="text-lg font-semibold flex items-center gap-2">
                                     <Bot className="w-5 h-5 opacity-70" />
                                     Recent Visits Log
                                 </h2>
+                                <div className="relative w-full sm:w-64">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                    <input
+                                        type="text"
+                                        placeholder="Filter by IP, location, path..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full bg-background border rounded-lg py-2 pl-9 pr-8 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            onClick={() => setSearchTerm("")}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full"
+                                        >
+                                            <X className="w-3 h-3 text-muted-foreground" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
@@ -456,28 +476,35 @@ export default function AdminDashboard() {
                                                 </td>
                                             </tr>
                                         ) : (
-                                            analytics.visits.map((visit) => (
-                                                <tr key={visit.id} className="hover:bg-muted/10 transition-colors">
-                                                    <td className="px-6 py-4 text-xs font-mono text-muted-foreground whitespace-nowrap">
-                                                        {new Date(visit.timestamp).toLocaleString()}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="text-sm font-medium">{visit.ip}</div>
-                                                        <div className="text-[10px] text-primary uppercase font-bold tracking-tight">
-                                                            {visit.city ? `${visit.city}, ${visit.country}` : visit.country || "Unknown Location"}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 hidden md:table-cell">
-                                                        <div className="text-xs font-medium uppercase">{visit.device}</div>
-                                                        <div className="text-[10px] text-muted-foreground">{visit.browser} / {visit.os}</div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <Badge variant="outline" className="text-[10px] font-mono">
-                                                            {visit.path}
-                                                        </Badge>
-                                                    </td>
-                                                </tr>
-                                            ))
+                                            analytics.visits
+                                                .filter(visit =>
+                                                    visit.ip.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                    visit.path.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                    (visit.country || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                    (visit.city || "").toLowerCase().includes(searchTerm.toLowerCase())
+                                                )
+                                                .map((visit) => (
+                                                    <tr key={visit.id} className="hover:bg-muted/10 transition-colors">
+                                                        <td className="px-6 py-4 text-xs font-mono text-muted-foreground whitespace-nowrap">
+                                                            {new Date(visit.timestamp).toLocaleString()}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="text-sm font-medium">{visit.ip}</div>
+                                                            <div className="text-[10px] text-primary uppercase font-bold tracking-tight">
+                                                                {visit.city ? `${visit.city}, ${visit.country}` : visit.country || "Unknown Location"}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 hidden md:table-cell">
+                                                            <div className="text-xs font-medium uppercase">{visit.device}</div>
+                                                            <div className="text-[10px] text-muted-foreground">{visit.browser} / {visit.os}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <Badge variant="outline" className="text-[10px] font-mono">
+                                                                {visit.path}
+                                                            </Badge>
+                                                        </td>
+                                                    </tr>
+                                                ))
                                         )}
                                     </tbody>
                                 </table>
