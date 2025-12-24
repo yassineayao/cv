@@ -16,9 +16,10 @@ Monitor the health and scale of your knowledge base:
 
 ### 2. Document Management
 A detailed list of all documents currently residing in the AI's memory.
-- **Upload File**: Directly upload new Markdown (`.md`) or text (`.txt`) files. The system will automatically save them to the `public/` directory and ingest them into the vector database.
-- **Sync All**: Scans the `public/` directory and re-ingests all `.md` files. This is useful for initial setup or after bulk updates.
-- **Re-ingest (Individual)**: Refresh a specific file from the `public/` folder into the database.
+- **Preview Content**: View the contents of any document directly in the dashboard using the **Eye** icon. Supports full Markdown rendering.
+- **Upload File**: Directly upload new Markdown (`.md`) or text (`.txt`) files. The system will automatically save them to the `public/knowledge/` directory and ingest them into the vector database.
+- **Sync All**: Scans the `public/knowledge/` directory and re-ingests all `.md` files. This is useful for initial setup or after bulk updates.
+- **Re-ingest (Individual)**: Refresh a specific file from the `public/knowledge/` folder into the database.
 - **Delete**: Completely removes a document and its associated chunks from the vector store.
 
 ## 🔄 Workflow: Adding New Knowledge
@@ -27,13 +28,14 @@ A detailed list of all documents currently residing in the AI's memory.
     - Click **Upload File** and select your document.
     - The file is saved and ingested automatically.
 2. **Via Filesystem**:
-    - Place a new Markdown file into the `app/public/` directory.
+    - Place a new Markdown file into the `app/public/knowledge/` directory.
     - Click **Sync All** on the dashboard.
 
 ## 🧰 Technical Implementation
 - **API Endpoint**: `app/api/admin/knowledge/route.ts`
 - **UI Component**: `app/admin/page.tsx`
 - **Database Logic**: `lib/rag/vector-store.ts` (extended with `listUniqueSources` and `deleteByFilename`)
+- **Knowledge Path**: `public/knowledge/` (Configurable in `lib/rag/config.ts`)
 
 ---
 > [!IMPORTANT]

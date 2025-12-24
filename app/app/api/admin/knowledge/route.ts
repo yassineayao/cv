@@ -1,17 +1,29 @@
 import { NextResponse } from 'next/server';
 import { listUniqueSources, deleteByFilename, getCollectionStats } from '@/lib/rag/vector-store';
 import { ingestDocument } from '@/lib/rag/ingest';
+import { RAG_CONFIG } from '@/lib/rag/config';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
+        const { searchParams } = new URL(req.url);
+        const action = searchParams.get('action');
+        const filename = searchParams.get('filename');
+
+        if (action === 'get-content' && filename) {
+            const knowledgeDir = path.join(process.cwd(), RAG_CONFIG.paths.knowledgeDir);
+            const filePath = path.join(knowledgeDir, filename);
+            const content = await fs.readFile(filePath, 'utf-8');
+            return NextResponse.json({ content });
+        }
+
         const sources = await listUniqueSources();
         const stats = await getCollectionStats();
         return NextResponse.json({ sources, stats });
     } catch (error) {
         console.error("Admin API Error:", error);
-        return NextResponse.json({ error: "Failed to fetch knowledge base info" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
     }
 }
 
@@ -30,8 +42,11 @@ export async function POST(req: Request) {
 
             const buffer = Buffer.from(await file.arrayBuffer());
             const filename = file.name;
-            const publicDir = path.join(process.cwd(), 'public');
-            const filePath = path.join(publicDir, filename);
+            const knowledgeDir = path.join(process.cwd(), RAG_CONFIG.paths.knowledgeDir);
+            const filePath = path.join(knowledgeDir, filename);
+
+            // Ensure directory exists
+            await fs.mkdir(knowledgeDir, { recursive: true });
 
             // Save file to disk
             await fs.writeFile(filePath, buffer);
@@ -49,12 +64,12 @@ export async function POST(req: Request) {
         const { action, filename } = await req.json();
 
         if (action === 'ingest-all') {
-            const publicDir = path.join(process.cwd(), 'public');
-            const files = await fs.readdir(publicDir);
+            const knowledgeDir = path.join(process.cwd(), RAG_CONFIG.paths.knowledgeDir);
+            const files = await fs.readdir(knowledgeDir);
             const mdFiles = files.filter(f => f.endsWith('.md'));
 
             for (const file of mdFiles) {
-                const filePath = path.join(publicDir, file);
+                const filePath = path.join(knowledgeDir, file);
                 const content = await fs.readFile(filePath, 'utf-8');
                 await ingestDocument(content, {
                     filename: file,
@@ -65,8 +80,8 @@ export async function POST(req: Request) {
         }
 
         if (action === 'ingest-file' && filename) {
-            const publicDir = path.join(process.cwd(), 'public');
-            const filePath = path.join(publicDir, filename);
+            const knowledgeDir = path.join(process.cwd(), RAG_CONFIG.paths.knowledgeDir);
+            const filePath = path.join(knowledgeDir, filename);
             const content = await fs.readFile(filePath, 'utf-8');
             await ingestDocument(content, {
                 filename,

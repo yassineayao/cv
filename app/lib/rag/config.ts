@@ -16,5 +16,8 @@ export const RAG_CONFIG = {
     model: {
         name: "gemini-2.5-flash",
         embedding: "text-embedding-004",
+    },
+    paths: {
+        knowledgeDir: "public/knowledge",
     }
 };

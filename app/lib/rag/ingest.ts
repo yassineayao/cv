@@ -2,7 +2,7 @@ import { google } from '@ai-sdk/google';
 import { embed, embedMany } from 'ai';
 import { v4 as uuidv4 } from 'uuid';
 import { RAG_CONFIG } from './config';
-import { ensureCollection, upsertChunk } from './vector-store';
+import { ensureCollection, upsertChunk, deleteByFilename } from './vector-store';
 
 import { generateSparseVector } from './sparse';
 
@@ -24,7 +24,11 @@ export async function ingestDocument(content: string, metadata: { filename: stri
     // 1. Ensure collection exists
     await ensureCollection();
 
-    // 2. Split text
+    // 2. Clear existing chunks for this file to prevent duplicates
+    console.log(`Clearing existing chunks for ${metadata.filename}...`);
+    await deleteByFilename(metadata.filename);
+
+    // 3. Split text
     const chunks = splitText(content);
     console.log(`Splitting document into ${chunks.length} chunks...`);
 

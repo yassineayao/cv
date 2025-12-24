@@ -10,7 +10,9 @@ import {
     AlertCircle,
     CheckCircle2,
     ArrowLeft,
-    Plus
+    Plus,
+    Eye,
+    X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -18,6 +20,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Source {
     filename: string;
@@ -36,6 +40,11 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    // Preview state
+    const [previewContent, setPreviewContent] = useState<string | null>(null);
+    const [previewFilename, setPreviewFilename] = useState<string | null>(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -56,6 +65,21 @@ export default function AdminDashboard() {
     useEffect(() => {
         fetchData();
     }, []);
+
+    const handlePreview = async (filename: string) => {
+        setPreviewFilename(filename);
+        setPreviewLoading(true);
+        try {
+            const res = await fetch(`/api/admin/knowledge?action=get-content&filename=${filename}`);
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            setPreviewContent(data.content);
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || "Failed to load preview." });
+        } finally {
+            setPreviewLoading(false);
+        }
+    };
 
     const handleAction = async (action: 'ingest-all' | 'ingest-file' | 'delete' | 'upload', filename?: string, file?: File) => {
         const id = filename ? `${action}-${filename}` : action;
@@ -105,7 +129,7 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-background p-6 font-sans">
+        <div className="min-h-screen bg-background p-6 font-sans relative">
             <div className="max-w-5xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -245,6 +269,15 @@ export default function AdminDashboard() {
                                                         variant="ghost"
                                                         size="icon"
                                                         className="h-8 w-8 text-primary hover:bg-primary/10"
+                                                        onClick={() => handlePreview(source.filename)}
+                                                        title="Preview Content"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-primary hover:bg-primary/10"
                                                         onClick={() => handleAction('ingest-file', source.filename)}
                                                         disabled={!!actionLoading}
                                                         title="Re-ingest"
@@ -274,10 +307,59 @@ export default function AdminDashboard() {
                 {/* Footer / Add section */}
                 <div className="text-center pt-4">
                     <p className="text-xs text-muted-foreground">
-                        Files are automatically pulled from the <code className="bg-muted px-1.5 py-0.5 rounded">public/</code> folder for ingestion.
+                        Files are automatically pulled from the <code className="bg-muted px-1.5 py-0.5 rounded">public/knowledge/</code> folder for ingestion.
                     </p>
                 </div>
             </div>
+
+            {/* Preview Modal */}
+            <AnimatePresence>
+                {(previewContent !== null || previewLoading) && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            className="w-full max-w-4xl h-[80vh] bg-card border shadow-2xl rounded-2xl flex flex-col overflow-hidden"
+                        >
+                            <div className="p-4 border-b flex justify-between items-center bg-muted/20">
+                                <div>
+                                    <h3 className="font-bold flex items-center gap-2">
+                                        <FileText className="w-4 h-4 text-primary" />
+                                        {previewFilename}
+                                    </h3>
+                                    <p className="text-xs text-muted-foreground lowercase">Internal file preview</p>
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                        setPreviewContent(null);
+                                        setPreviewFilename(null);
+                                    }}
+                                >
+                                    <X className="w-5 h-5" />
+                                </Button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-8 prose prose-sm dark:prose-invert max-w-none">
+                                {previewLoading ? (
+                                    <div className="flex flex-col items-center justify-center h-full opacity-50 italic">
+                                        <RefreshCw className="w-8 h-8 animate-spin mb-4" />
+                                        Loading content...
+                                    </div>
+                                ) : (
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent || ""}</ReactMarkdown>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
