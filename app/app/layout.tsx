@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: "Interactive Storybook CV of Yassine, a Full-Stack Developer.",
 };
 
+import { VisitTracker } from "@/components/layout/VisitTracker";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,6 +35,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased font-sans`}
       >
+        <VisitTracker />
         {children}
       </body>
     </html>

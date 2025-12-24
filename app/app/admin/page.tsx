@@ -13,7 +13,8 @@ import {
     Plus,
     Eye,
     X,
-    LogOut
+    LogOut,
+    Bot
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -37,10 +38,33 @@ interface Stats {
     status: string;
 }
 
+interface Visit {
+    id: string;
+    timestamp: string;
+    ip: string;
+    path: string;
+    country: string;
+    city: string;
+    device: string;
+    browser: string;
+    os: string;
+}
+
+interface AnalyticsData {
+    visits: Visit[];
+    stats: {
+        totalVisits: number;
+        topCountries: { name: string; count: number }[];
+    };
+}
+
 export default function AdminDashboard() {
+    const [activeTab, setActiveTab] = useState<'knowledge' | 'analytics'>('knowledge');
     const [sources, setSources] = useState<Source[]>([]);
     const [stats, setStats] = useState<Stats>({ pointsCount: 0, status: "idle" });
+    const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [analyticsLoading, setAnalyticsLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const router = useRouter();
@@ -66,9 +90,28 @@ export default function AdminDashboard() {
         }
     };
 
+    const fetchAnalytics = async () => {
+        try {
+            setAnalyticsLoading(true);
+            const res = await fetch('/api/admin/analytics');
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            setAnalytics(data);
+        } catch (error) {
+            console.error(error);
+            setMessage({ type: 'error', text: "Failed to load analytics data." });
+        } finally {
+            setAnalyticsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (activeTab === 'knowledge') {
+            fetchData();
+        } else {
+            fetchAnalytics();
+        }
+    }, [activeTab]);
 
     const handlePreview = async (filename: string) => {
         setPreviewFilename(filename);
@@ -138,7 +181,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-background p-6 font-sans relative">
-            <div className="max-w-5xl mx-auto space-y-8">
+            <div className="max-w-6xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -147,39 +190,75 @@ export default function AdminDashboard() {
                         </Link>
                         <h1 className="text-3xl font-bold flex items-center gap-3">
                             <DatabaseZap className="text-primary w-8 h-8" />
-                            Knowledge Base Admin
+                            Admin Dashboard
                         </h1>
                     </div>
                     <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
-                        <input
-                            type="file"
-                            id="file-upload"
-                            className="hidden"
-                            accept=".md,.txt"
-                            onChange={handleFileUpload}
-                            disabled={!!actionLoading}
-                        />
-                        <Button
-                            variant="outline"
-                            onClick={() => document.getElementById('file-upload')?.click()}
-                            disabled={!!actionLoading}
-                            className="flex-1 sm:flex-none"
-                        >
-                            {actionLoading === 'upload' ? (
-                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                                <Plus className="w-4 h-4 mr-2" />
-                            )}
-                            Upload File
-                        </Button>
-                        <Button
-                            onClick={() => handleAction('ingest-all')}
-                            disabled={!!actionLoading || loading}
-                            className="shadow-glow-primary flex-1 sm:flex-none"
-                        >
-                            {actionLoading === 'ingest-all' ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-                            Sync All
-                        </Button>
+                        <div className="bg-muted p-1 rounded-lg flex gap-1 mr-2">
+                            <Button
+                                variant={activeTab === 'knowledge' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="h-8 text-xs font-bold"
+                                onClick={() => setActiveTab('knowledge')}
+                            >
+                                Knowledge
+                            </Button>
+                            <Button
+                                variant={activeTab === 'analytics' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="h-8 text-xs font-bold"
+                                onClick={() => setActiveTab('analytics')}
+                            >
+                                Analytics
+                            </Button>
+                        </div>
+
+                        {activeTab === 'knowledge' && (
+                            <>
+                                <input
+                                    type="file"
+                                    id="file-upload"
+                                    className="hidden"
+                                    accept=".md,.txt"
+                                    onChange={handleFileUpload}
+                                    disabled={!!actionLoading}
+                                />
+                                <Button
+                                    variant="outline"
+                                    onClick={() => document.getElementById('file-upload')?.click()}
+                                    disabled={!!actionLoading}
+                                    className="flex-1 sm:flex-none"
+                                >
+                                    {actionLoading === 'upload' ? (
+                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                    ) : (
+                                        <Plus className="w-4 h-4 mr-2" />
+                                    )}
+                                    Upload File
+                                </Button>
+                                <Button
+                                    onClick={() => handleAction('ingest-all')}
+                                    disabled={!!actionLoading || loading}
+                                    className="shadow-glow-primary flex-1 sm:flex-none"
+                                >
+                                    {actionLoading === 'ingest-all' ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                                    Sync All
+                                </Button>
+                            </>
+                        )}
+
+                        {activeTab === 'analytics' && (
+                            <Button
+                                variant="outline"
+                                onClick={fetchAnalytics}
+                                disabled={analyticsLoading}
+                                className="flex-1 sm:flex-none"
+                            >
+                                <RefreshCw className={cn("w-4 h-4 mr-2", analyticsLoading && "animate-spin")} />
+                                Refresh
+                            </Button>
+                        )}
+
                         <Button
                             variant="ghost"
                             size="icon"
@@ -210,116 +289,202 @@ export default function AdminDashboard() {
                     )}
                 </AnimatePresence>
 
-                {/* Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
-                        <Database className="w-8 h-8 text-primary opacity-80" />
-                        <div className="text-2xl font-bold">{stats.pointsCount}</div>
-                        <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Chunks</div>
-                    </Card>
-                    <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
-                        <FileText className="w-8 h-8 text-primary opacity-80" />
-                        <div className="text-2xl font-bold">{sources.length}</div>
-                        <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Unique Files</div>
-                    </Card>
-                    <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
-                        <div className={cn("w-3 h-3 rounded-full animate-pulse", stats.status === 'ok' ? "bg-green-500" : "bg-yellow-500")} />
-                        <div className="text-2xl font-bold uppercase tracking-tight">{stats.status}</div>
-                        <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">DB Status</div>
-                    </Card>
-                </div>
+                {activeTab === 'knowledge' ? (
+                    <>
+                        {/* Knowledge Stats */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
+                                <Database className="w-8 h-8 text-primary opacity-80" />
+                                <div className="text-2xl font-bold">{stats.pointsCount}</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Chunks</div>
+                            </Card>
+                            <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
+                                <FileText className="w-8 h-8 text-primary opacity-80" />
+                                <div className="text-2xl font-bold">{sources.length}</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Unique Files</div>
+                            </Card>
+                            <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
+                                <div className={cn("w-3 h-3 rounded-full animate-pulse", stats.status === 'ok' ? "bg-green-500" : "bg-yellow-500")} />
+                                <div className="text-2xl font-bold uppercase tracking-tight">{stats.status}</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">DB Status</div>
+                            </Card>
+                        </div>
 
-                {/* Data Table */}
-                <Card className="overflow-hidden border-primary/10 shadow-xl bg-card/50 backdrop-blur-sm">
-                    <div className="p-6 border-b bg-muted/20">
-                        <h2 className="text-lg font-semibold flex items-center gap-2">
-                            <FileText className="w-5 h-5 opacity-70" />
-                            Ingested Documents
-                        </h2>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-muted/10 text-muted-foreground text-xs uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4 font-semibold">Filename</th>
-                                    <th className="px-6 py-4 font-semibold hidden md:table-cell">Type</th>
-                                    <th className="px-6 py-4 font-semibold hidden sm:table-cell">Chunks</th>
-                                    <th className="px-6 py-4 font-semibold text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-border/40">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground italic">
-                                            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 opacity-50" />
-                                            Loading knowledge base...
-                                        </td>
-                                    </tr>
-                                ) : sources.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground italic">
-                                            No documents found in database.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    sources.map((source) => (
-                                        <tr key={source.filename} className="hover:bg-muted/10 transition-colors group">
-                                            <td className="px-6 py-4 max-w-[150px] sm:max-w-none">
-                                                <div className="flex items-center gap-2 overflow-hidden">
-                                                    <FileText className="w-4 h-4 text-primary opacity-60 shrink-0" />
-                                                    <span className="font-medium text-sm truncate">{source.filename}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 hidden md:table-cell">
-                                                <Badge variant="secondary" className="text-[10px] uppercase font-bold py-0 h-5">
-                                                    {source.sourceType}
-                                                </Badge>
-                                            </td>
-                                            <td className="px-6 py-4 hidden sm:table-cell">
-                                                <span className="text-sm font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground border">
-                                                    {source.count}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <div className="flex justify-end gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-primary hover:bg-primary/10"
-                                                        onClick={() => handlePreview(source.filename)}
-                                                        title="Preview Content"
-                                                    >
-                                                        <Eye className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-primary hover:bg-primary/10"
-                                                        onClick={() => handleAction('ingest-file', source.filename)}
-                                                        disabled={!!actionLoading}
-                                                        title="Re-ingest"
-                                                    >
-                                                        {actionLoading === `ingest-file-${source.filename}` ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                                        onClick={() => handleAction('delete', source.filename)}
-                                                        disabled={!!actionLoading}
-                                                        title="Delete from DB"
-                                                    >
-                                                        {actionLoading === `delete-${source.filename}` ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                                                    </Button>
-                                                </div>
-                                            </td>
+                        {/* Knowledge Table */}
+                        <Card className="overflow-hidden border-primary/10 shadow-xl bg-card/50 backdrop-blur-sm">
+                            <div className="p-6 border-b bg-muted/20">
+                                <h2 className="text-lg font-semibold flex items-center gap-2">
+                                    <FileText className="w-5 h-5 opacity-70" />
+                                    Ingested Documents
+                                </h2>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead className="bg-muted/10 text-muted-foreground text-xs uppercase tracking-wider">
+                                        <tr>
+                                            <th className="px-6 py-4 font-semibold">Filename</th>
+                                            <th className="px-6 py-4 font-semibold hidden md:table-cell">Type</th>
+                                            <th className="px-6 py-4 font-semibold hidden sm:table-cell">Chunks</th>
+                                            <th className="px-6 py-4 font-semibold text-right">Actions</th>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </Card>
+                                    </thead>
+                                    <tbody className="divide-y divide-border/40">
+                                        {loading ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground italic">
+                                                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 opacity-50" />
+                                                    Loading knowledge base...
+                                                </td>
+                                            </tr>
+                                        ) : sources.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground italic">
+                                                    No documents found in database.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            sources.map((source) => (
+                                                <tr key={source.filename} className="hover:bg-muted/10 transition-colors group">
+                                                    <td className="px-6 py-4 max-w-[150px] sm:max-w-none">
+                                                        <div className="flex items-center gap-2 overflow-hidden">
+                                                            <FileText className="w-4 h-4 text-primary opacity-60 shrink-0" />
+                                                            <span className="font-medium text-sm truncate">{source.filename}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 hidden md:table-cell">
+                                                        <Badge variant="secondary" className="text-[10px] uppercase font-bold py-0 h-5">
+                                                            {source.sourceType}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="px-6 py-4 hidden sm:table-cell">
+                                                        <span className="text-sm font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground border">
+                                                            {source.count}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <div className="flex justify-end gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 text-primary hover:bg-primary/10"
+                                                                onClick={() => handlePreview(source.filename)}
+                                                                title="Preview Content"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 text-primary hover:bg-primary/10"
+                                                                onClick={() => handleAction('ingest-file', source.filename)}
+                                                                disabled={!!actionLoading}
+                                                                title="Re-ingest"
+                                                            >
+                                                                {actionLoading === `ingest-file-${source.filename}` ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                                                onClick={() => handleAction('delete', source.filename)}
+                                                                disabled={!!actionLoading}
+                                                                title="Delete from DB"
+                                                            >
+                                                                {actionLoading === `delete-${source.filename}` ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                                            </Button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
+                    </>
+                ) : (
+                    <>
+                        {/* Analytics Stats */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
+                                <Eye className="w-8 h-8 text-primary opacity-80" />
+                                <div className="text-2xl font-bold">{analytics?.stats.totalVisits || 0}</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Visits</div>
+                            </Card>
+                            <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
+                                <Badge className="mb-1">{analytics?.stats.topCountries[0]?.name || "N/A"}</Badge>
+                                <div className="text-2xl font-bold">{analytics?.stats.topCountries[0]?.count || 0}</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Top Country</div>
+                            </Card>
+                            <Card className="p-6 flex flex-col items-center justify-center text-center space-y-2 bg-muted/30 border-primary/10 transition-all hover:border-primary/30">
+                                <Bot className="w-8 h-8 text-primary opacity-80" />
+                                <div className="text-2xl font-bold">100%</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Real-time Tracking</div>
+                            </Card>
+                        </div>
+
+                        {/* Analytics Table */}
+                        <Card className="overflow-hidden border-primary/10 shadow-xl bg-card/50 backdrop-blur-sm">
+                            <div className="p-6 border-b bg-muted/20">
+                                <h2 className="text-lg font-semibold flex items-center gap-2">
+                                    <Bot className="w-5 h-5 opacity-70" />
+                                    Recent Visits Log
+                                </h2>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead className="bg-muted/10 text-muted-foreground text-xs uppercase tracking-wider">
+                                        <tr>
+                                            <th className="px-6 py-4 font-semibold">Time</th>
+                                            <th className="px-6 py-4 font-semibold">IP / Location</th>
+                                            <th className="px-6 py-4 font-semibold hidden md:table-cell">Device / OS</th>
+                                            <th className="px-6 py-4 font-semibold">Path</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border/40">
+                                        {analyticsLoading ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground italic">
+                                                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 opacity-50" />
+                                                    Loading analytics...
+                                                </td>
+                                            </tr>
+                                        ) : !analytics || analytics.visits.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground italic">
+                                                    No visit data recorded yet.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            analytics.visits.map((visit) => (
+                                                <tr key={visit.id} className="hover:bg-muted/10 transition-colors">
+                                                    <td className="px-6 py-4 text-xs font-mono text-muted-foreground whitespace-nowrap">
+                                                        {new Date(visit.timestamp).toLocaleString()}
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="text-sm font-medium">{visit.ip}</div>
+                                                        <div className="text-[10px] text-primary uppercase font-bold tracking-tight">
+                                                            {visit.city ? `${visit.city}, ${visit.country}` : visit.country || "Unknown Location"}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 hidden md:table-cell">
+                                                        <div className="text-xs font-medium uppercase">{visit.device}</div>
+                                                        <div className="text-[10px] text-muted-foreground">{visit.browser} / {visit.os}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <Badge variant="outline" className="text-[10px] font-mono">
+                                                            {visit.path}
+                                                        </Badge>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
+                    </>
+                )}
 
                 {/* Footer / Add section */}
                 <div className="text-center pt-4">
