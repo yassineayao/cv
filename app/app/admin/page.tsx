@@ -204,7 +204,8 @@ export default function AdminDashboard() {
     };
 
     const handleLogout = async () => {
-        await signOut({ callbackUrl: "/login" });
+        await signOut({ redirect: false });
+        window.location.href = "/login";
     };
 
     const Pagination = ({
