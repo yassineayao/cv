@@ -1,42 +1,49 @@
 # AI Story Advisor: Admin Dashboard
 
-The Admin Dashboard provides a simple and secure (internal) interface to manage the knowledge base that powers the AI Story Advisor.
+The Admin Dashboard provides a professional and secure interface to manage the knowledge base and monitor user engagement for the AI Story Advisor.
 
-## 🔗 Access
+## 🔗 Access & Security
 - **URL**: `/admin`
-- **Purpose**: Real-time management of the vector database without using terminal scripts.
+- **Authentication**: Secured via **Auth.js (NextAuth.js v5)** with a **Prisma Adapter** for database-backed sessions.
+- **Login Experience**: Features a premium glassmorphism interface with dynamic mesh gradients and secure password handling.
 
 ## 🛠️ Key Features
 
-### 1. Database Statistics
-Monitor the health and scale of your knowledge base:
-- **Total Chunks**: Total number of data segments stored in Qdrant.
-- **Unique Files**: Number of distinct source documents ingested.
-- **DB Status**: Real-time connection status with the Qdrant service.
+### 1. Knowledge Base Management
+A real-time interface for managing vector database content:
+- **Database Statistics**: Monitor total chunks, unique files, and connection status.
+- **Document List**: Browse ingested files with **Client-side Pagination** for a snappy experience.
+- **Preview Content**: View Markdown-rendered document content directly via the **Eye** icon.
+- **Management Tools**: Upload new files, re-ingest individual documents, or perform a manual **Sync All** to refresh the entire store.
 
-### 2. Document Management
-A detailed list of all documents currently residing in the AI's memory.
-- **Preview Content**: View the contents of any document directly in the dashboard using the **Eye** icon. Supports full Markdown rendering.
-- **Upload File**: Directly upload new Markdown (`.md`) or text (`.txt`) files. The system will automatically save them to the `public/knowledge/` directory and ingest them into the vector database.
-- **Sync All**: Scans the `public/knowledge/` directory and re-ingests all `.md` files. This is useful for initial setup or after bulk updates.
-- **Re-ingest (Individual)**: Refresh a specific file from the `public/knowledge/` folder into the database.
-- **Delete**: Completely removes a document and its associated chunks from the vector store.
+### 2. User Visit Analytics
+A dedicated tab for monitoring traffic and engagement:
+- **Real-time Insights**: View total visits and top countries at a glance.
+- **Advanced Filtering**: Use the **Server-side Search** to filter logs by IP, path, country, or city across the entire database.
+- **High-Performance Pagination**: Uses **Server-side Pagination** to handle high traffic volumes efficiently.
+- **Detailed Logs**: Monitor visitor IP, geolocation (country/city), device info, OS, and the specific path visited.
+
+### 3. Global Theme Consistency
+The dashboard (and the login page) are fully synchronized with the portfolio's theme:
+- **Theme Sync**: Uses a global `ThemeProvider` to ensure your preference (Light/Dark) persists across navigation and page refreshes.
+- **High Contrast UI**: Action buttons and tabs are optimized for maximum visibility in both theme modes.
 
 ## 🔄 Workflow: Adding New Knowledge
-1. **Via Dashboard (Recommended)**:
-    - Navigate to `/admin`.
-    - Click **Upload File** and select your document.
-    - The file is saved and ingested automatically.
-2. **Via Filesystem**:
-    - Place a new Markdown file into the `app/public/knowledge/` directory.
-    - Click **Sync All** on the dashboard.
+1. **Direct Upload**:
+    - Navigate to `/admin` -> **Knowledge** tab.
+    - Click **Upload File** (supports `.md` and `.txt`).
+    - The system saves the file to `public/knowledge/` and trigger RAG ingestion automatically.
+2. **Bulk Ingestion**:
+    - Place new files in the `app/public/knowledge/` directory.
+    - Click **Sync All** on the dashboard to ensure the vector database matches the filesystem.
 
-## 🧰 Technical Implementation
-- **API Endpoint**: `app/api/admin/knowledge/route.ts`
-- **UI Component**: `app/admin/page.tsx`
-- **Database Logic**: `lib/rag/vector-store.ts` (extended with `listUniqueSources` and `deleteByFilename`)
-- **Knowledge Path**: `public/knowledge/` (Configurable in `lib/rag/config.ts`)
+## 🧰 Technical Stack
+- **API Endpoints**: 
+  - `app/api/admin/knowledge/route.ts` (Document control)
+  - `app/api/admin/analytics/route.ts` (Paginated visit logs)
+- **UI Architecture**: `app/admin/page.tsx` (State-driven tabs, debounced search, reusable Pagination component)
+- **Database Logic**: Prisma ORM for analytics; Qdrant for vector embeddings.
 
 ---
-> [!IMPORTANT]
-> This dashboard is intended for development and maintenance. Ensure proper authentication is added if the site is deployed to a public environment where the `/admin` route is exposed.
+> [!TIP]
+> **Performance Tip**: The Analytics table uses debounced server-side filtering (500ms). Simply type in the search box and the dashboard will automatically fetch the filtered results from the database.

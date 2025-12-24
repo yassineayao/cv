@@ -45,7 +45,9 @@ graph TD
   - Floating interface with spring animations.
   - Markdown support with syntax highlighting.
   - Real-time typing indicators ("Yassine is typing...").
-  - Suggested prompts for quick interaction.
+  - **Suggested Prompts**: Interactive chips for quick guided interaction.
+- **Analytics Tracking**: Deep insights into user engagement and geolocation via a secure dashboard.
+- **Paginated Management**: High-performance interfaces for browsing knowledge base content and visit logs.
 
 ## 📂 Documentation Directory
 

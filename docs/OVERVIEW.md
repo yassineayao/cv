@@ -134,6 +134,8 @@ If you want to see my quests in action or reach me for collaboration:
   * Hover animations on skills/tools (bounce, glow, or rotate).
   * GIFs or small looping animations for interactions (e.g., a code snippet typing animation).
 * **Responsive:** Works on desktop and mobile (maybe slightly simplified for mobile).
+* **Global Theme Synchronization**: A centralized theme management system ensures that user preferences (Light/Dark) are applied consistently across all pages, including the sensitive administrative areas.
+* **Admin Dashboard v2**: Beyond content management, the dashboard now tracks user engagement with real-time analytics, geolocation insights, and high-performance server-side data handling.
 
 ---
 
