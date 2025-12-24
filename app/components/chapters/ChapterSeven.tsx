@@ -19,13 +19,29 @@ export function ChapterSeven() {
     return (
         <section className="h-screen w-full snap-start flex flex-col items-center justify-center p-4 sm:p-8 bg-gradient-to-t from-background to-muted/30 relative overflow-hidden overflow-y-auto">
 
-            <div className="max-w-3xl text-center space-y-6 sm:space-y-12 animate-in fade-in duration-1000 px-2">
+            <div className="max-w-4xl text-center space-y-6 sm:space-y-10 animate-in fade-in duration-1000 px-4 relative z-10">
+                {/* Chapter Image */}
+                <div className="flex justify-center mb-4 sm:mb-8">
+                    <div className="relative group">
+                        <div className="absolute -top-4 sm:-top-6 -left-4 sm:-left-6 text-4xl sm:text-6xl font-serif text-primary/10">"</div>
+                        <div className="w-32 h-32 sm:w-48 sm:h-48 bg-primary/5 rounded-3xl shadow-xl rotate-3 relative overflow-hidden transform transition-all hover:rotate-0 group-hover:scale-105 duration-500 border border-primary/10">
+                            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent z-10 opacity-40 group-hover:opacity-10 transition-opacity" />
+                            <img
+                                src="/assets/chapter7.png"
+                                alt="Final Chapter"
+                                className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700"
+                            />
+                            <div className="absolute inset-2 border border-white/20 rounded-2xl z-20 pointer-events-none" />
+                        </div>
+                    </div>
+                </div>
+
                 <div className="space-y-2 sm:space-y-4">
-                    <h3 className="text-xs sm:text-sm font-bold text-primary tracking-widest uppercase mb-1 sm:mb-2">Final Chapter</h3>
-                    <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight lg:text-7xl font-serif">
+                    <h3 className="text-[10px] sm:text-xs font-bold text-primary tracking-[0.3em] uppercase mb-1 sm:mb-2 opacity-80">The Finale</h3>
+                    <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight lg:text-8xl font-serif mb-2 sm:mb-4">
                         {config.contactPage.title}
                     </h2>
-                    <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+                    <p className="text-base sm:text-xl text-muted-foreground/80 max-w-2xl mx-auto font-medium">
                         {config.contactPage.description}
                     </p>
                 </div>
