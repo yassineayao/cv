@@ -27,6 +27,13 @@ export const ensureCollection = async () => {
                     size: RAG_CONFIG.qdrant.vectorSize,
                     distance: "Cosine",
                 },
+                sparse_vectors: {
+                    "sparse-text": {
+                        index: {
+                            on_disk: true,
+                        },
+                    },
+                },
             });
         }
     } catch (error) {
@@ -45,17 +52,21 @@ export const upsertChunk = async (
     id: string,
     vector: number[],
     payload: ChunkMetadata,
-    content: string
+    content: string,
+    sparseVector?: { indices: number[], values: number[] }
 ) => {
     const client = getQdrantClient();
     await client.upsert(RAG_CONFIG.qdrant.collectionName, {
         points: [
             {
                 id,
-                vector,
+                vector: sparseVector ? {
+                    "": vector, // default vector
+                    "sparse-text": sparseVector
+                } : vector,
                 payload: {
                     ...payload,
-                    content, // Storing content in payload for easy retrieval
+                    content,
                 },
             },
         ],
@@ -66,6 +77,38 @@ export const searchVectorParams = async (vector: number[], limit: number = 20) =
     const client = getQdrantClient();
     return await client.search(RAG_CONFIG.qdrant.collectionName, {
         vector,
+        limit,
+        with_payload: true,
+    });
+};
+
+export const searchHybrid = async (
+    denseVector: number[],
+    sparseVector: { indices: number[], values: number[] },
+    limit: number = 20
+) => {
+    const client = getQdrantClient();
+
+    // Using Recommend/Search API with Fusion
+    // Note: Qdrant 1.10+ supports Reciprocal Rank Fusion (RRF)
+    // For simplicity, we can use the 'prefetch' and 'query' API if available in this client version
+    // Or just do a search with multiple prefetch steps.
+
+    return await client.query(RAG_CONFIG.qdrant.collectionName, {
+        prefetch: [
+            {
+                query: denseVector,
+                limit,
+            },
+            {
+                query: sparseVector,
+                using: "sparse-text",
+                limit,
+            }
+        ],
+        query: {
+            fusion: "rrf"
+        },
         limit,
         with_payload: true,
     });

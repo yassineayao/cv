@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { RAG_CONFIG } from './config';
 import { ensureCollection, upsertChunk } from './vector-store';
 
+import { generateSparseVector } from './sparse';
+
 const MAX_CHUNK_SIZE = 500; // Characters roughly
 const CHUNK_OVERLAP = 50;
 
@@ -36,8 +38,9 @@ export async function ingestDocument(content: string, metadata: { filename: stri
     console.log(`Upserting ${chunks.length} chunks to Qdrant...`);
     const upsertPromises = chunks.map((chunk, index) => {
         const vector = embeddings[index];
+        const sparseVector = generateSparseVector(chunk);
         const id = uuidv4();
-        return upsertChunk(id, vector, { ...metadata, chunkIndex: index }, chunk);
+        return upsertChunk(id, vector, { ...metadata, chunkIndex: index }, chunk, sparseVector);
     });
 
     await Promise.all(upsertPromises);
