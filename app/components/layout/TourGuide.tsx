@@ -83,6 +83,12 @@ const TOUR_STEPS: Step[] = [
         placement: 'bottom',
         title: '⚙️ Admin Access',
     },
+    {
+        target: '[data-tour="github-link"]',
+        content: 'Curious about the code? View the full source code of this portfolio on GitHub.',
+        placement: 'bottom',
+        title: '💻 View Source',
+    },
 ];
 
 const STORAGE_KEY = 'portfolio-tour-completed';
