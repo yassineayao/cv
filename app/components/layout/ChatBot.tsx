@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
-import { Scroll, X, Send, Bot, User, Loader2, Sparkles, MessageCircle } from "lucide-react";
+import { Scroll, X, Send, Bot, User, Loader2, Sparkles, MessageCircle, Maximize2, Minimize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,6 +23,7 @@ export function ChatBot() {
     const inputRef = useRef<HTMLInputElement>(null);
     const { messages, sendMessage, isLoading } = useChat() as any;
     const [showPulse, setShowPulse] = useState(true);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -47,7 +48,7 @@ export function ChatBot() {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -55,12 +56,20 @@ export function ChatBot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="mb-4 w-[90vw] sm:w-[420px] h-[70vh] sm:h-[600px] max-h-[700px] flex flex-col"
+                        className={cn(
+                            "mb-4 flex flex-col transition-all duration-300 ease-in-out",
+                            isFullScreen
+                                ? "fixed inset-4 w-auto h-auto sm:w-auto sm:h-auto max-h-none z-[110]"
+                                : "w-[90vw] sm:w-[420px] h-[70vh] sm:h-[600px] max-h-[700px]"
+                        )}
                     >
-                        <Card className="flex-1 flex flex-col overflow-hidden border-primary/30 shadow-2xl bg-background/98 backdrop-blur-2xl rounded-3xl">
+                        <Card className={cn(
+                            "flex-1 flex flex-col overflow-hidden border-primary/30 shadow-2xl bg-background/98 backdrop-blur-2xl transition-all duration-300",
+                            isFullScreen ? "rounded-2xl" : "rounded-3xl"
+                        )}>
                             {/* Header */}
                             <div className="p-4 bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground flex items-center justify-between relative overflow-hidden">
-                                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48L3N2Zz4=')] opacity-50" />
+                                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48L3N2Zz4=')] opacity-50 pointer-events-none" />
                                 <div className="flex items-center gap-3 relative z-10">
                                     <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                                         <Bot className="w-5 h-5" />
@@ -72,14 +81,25 @@ export function ChatBot() {
                                         </span>
                                     </div>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={toggleChat}
-                                    className="hover:bg-white/20 text-primary-foreground h-9 w-9 rounded-xl relative z-10"
-                                >
-                                    <X className="w-5 h-5" />
-                                </Button>
+                                <div className="flex items-center gap-1 relative z-10">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setIsFullScreen(!isFullScreen)}
+                                        className="hover:bg-white/20 text-primary-foreground h-9 w-9 rounded-xl hidden sm:flex"
+                                        title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
+                                    >
+                                        {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={toggleChat}
+                                        className="hover:bg-white/20 text-primary-foreground h-9 w-9 rounded-xl"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </Button>
+                                </div>
                             </div>
 
                             {/* Messages */}
@@ -291,7 +311,7 @@ export function ChatBot() {
                         initial={{ scale: 1, opacity: 0.5 }}
                         animate={{ scale: 1.5, opacity: 0 }}
                         transition={{ repeat: Infinity, duration: 2 }}
-                        className="absolute inset-0 bg-primary rounded-full"
+                        className="absolute inset-0 bg-primary rounded-full pointer-events-none"
                     />
                 )}
                 <motion.button
