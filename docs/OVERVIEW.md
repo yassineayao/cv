@@ -279,9 +279,20 @@ If you want to see my quests in action or reach me for collaboration:
 
 ---
 
-### **Extra Interactive Ideas**
+---
 
-* Typing GIF effect for code snippets in some sections.
-* Particle animations when switching chapters (like turning a page).
-* Subtle background animations for depth (moving clouds, floating code symbols).
-* Smooth fade/slide transitions between chapters.
+## **The Secret Feature: The AI Scroll (Chatbot)**
+
+**Theme:** “The wise advisor”
+**Illustration:** A floating, ancient scroll that contains the knowledge of all previous chapters.
+
+**Text:**
+```
+Still have questions? Consult the AI Scroll. It has deep knowledge of Yassine's journey, from his Master's degree to his latest RAG implementation.
+```
+
+**Technical Highlight:**
+- **RAG (Retrieval-Augmented Generation)**: Uses your documentation as a knowledge base.
+- **Hybrid Search**: Combines semantic meaning and exact keyword matching.
+- **Reranking**: Ensures the most accurate answer is always retrieved.
+- **Privacy**: Context is retrieved locally from Qdrant before being processed securely via Gemini API.

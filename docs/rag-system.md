@@ -22,7 +22,7 @@ graph TD
     end
     
     subgraph "Generation"
-        Backend -->|6. Prompt + Context| LLM[Gemini-3-Flash]
+        Backend -->|6. Prompt + Context| LLM[Gemini-3-Flash-Preview]
         LLM -->|7. Streaming Response| Backend
     end
     
@@ -37,7 +37,8 @@ graph TD
 - **AI SDK**: Vercel AI SDK (`ai`, `@ai-sdk/google`)
 - **LLM**: Google `gemini-3-flash-preview`
 - **Vector DB**: Qdrant (Dockerized)
-- **Embeddings**: `nomic-embed-text` or `text-embedding-3-small` (via AI SDK)
+- **Embeddings**: Google `text-embedding-004` (via AI SDK)
+- **Local Reranker**: `@xenova/transformers` (TinyBERT)
 
 ---
 
@@ -45,31 +46,35 @@ graph TD
 
 ### 1. Ingestion Engine
 **Goal**: Convert raw documents into searchable chunks.
-- **Path**: `lib/rag/ingest.ts` (Proposed)
+- **Library Path**: `app/lib/rag/ingest.ts`
+- **Script Path**: `app/scripts/ingest-kb.ts`
 - **Process**:
-    1.  Read Markdown/PDF files.
-    2.  Split into chunks (e.g., 500 tokens with overlap).
-    3.  Generate Embeddings (Vectors).
-    4.  Upsert to Qdrant.
+    1.  Read Markdown files from `app/public/`.
+    2.  Split into chunks (500 characters with 50 overlap).
+    3.  Generate Dense Embeddings (`text-embedding-004`).
+    4.  Generate Sparse Vectors (Hash-based, see `lib/rag/sparse.ts`).
+    5.  Upsert to Qdrant collection `knowledge-base`.
 
 ### 2. Vector Store (Qdrant)
 **Goal**: fast storage and retrieval.
 - **Location**: Running locally via Docker.
 - **Collection Name**: `knowledge-base`
-- **Payload**: Stores metadata (filename, page number) alongside vectors.
+- **Logic**: `lib/rag/vector-store.ts`
+- **Configuration**: Supports both dense and sparse vectors in the same collection.
 
 ### 3. Retriever (The Brain)
-**Path**: `lib/rag/retriever.ts`
+**Path**: `app/lib/rag/retrieve.ts`
 - Implements **Hybrid Search**:
-    - Queries Qdrant for both semantic distance and keyword matches.
+    - Queries Qdrant for both semantic distance (dense) and keyword matches (sparse).
+    - Merges results using **Reciprocal Rank Fusion (RRF)**.
 - Implements **Reranking**:
-    - Uses a **local Cross-Encoder** via `@xenova/transformers` (e.g., `Xenova/ms-marco-TinyBERT-L-2-v2` or `Xenova/bge-reranker-base`).
-    - Runs entirely on the server (no external API required) to re-order results.
+    - Uses a **local Cross-Encoder** (`Xenova/ms-marco-TinyBERT-L-2-v2`).
+    - Compares the query directly with candidate documents to ensure relevance.
 
 ### 4. Generator (Chatbot)
 **Path**: `app/api/chat/route.ts`
 - Uses `streamText` from Vercel AI SDK.
-- Constructs a prompt injecting the **retrieved context** dynamically.
+- Constructs a system prompt injecting the **retrieved context** dynamically.
 
 ---
 
@@ -77,43 +82,23 @@ graph TD
 
 To ensure the system is easy to allow swapping parts:
 
-1.  **Interfaces**: We define strict interfaces.
-    ```typescript
-    interface VectorStore {
-      search(query: string): Promise<Document[]>;
-      add(documents: Document[]): Promise<void>;
-    }
-    ```
-2.  **Configuration**:
-    - All model names, API keys, and prompt templates should be in `lib/rag/config.ts`, not hardcoded in logic files.
+1.  **Shared Configuration**:
+    - All model names, API keys, and Qdrant settings are in `lib/rag/config.ts`.
+2.  **Stateless API**:
+    - The chat route handles context retrieval and streaming response in a single stateless POST request.
 
 ---
 
-## Integration Steps
+## Operations
 
-1.  **Start Qdrant**:
-    Run `docker-compose up -d` (see root `docker-compose.yml`).
+### How to Ingest Documents
+Whenever you add or update files in `app/public/*.md`, run the following command from the `app` directory:
+```bash
+bun scripts/ingest-kb.ts
+```
 
-
-2.  **Environment Variables**:
-    Copy `.env.example` to a new file named `.env`:
-    ```bash
-    cp .env.example .env
-    ```
-    Then update the values in `.env`:
-    ```bash
-    GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
-    QDRANT_URL=http://localhost:6333
-    ```
-
-
-3.  **Install Dependencies**:
-    ```bash
-    npm install ai @ai-sdk/google @qdrant/js-client-rest @xenova/transformers
-    ```
-
-4.  **Ingest Content**:
-    (Script to be implemented) Run the ingestion script to populate the DB.
-
-5.  **Start Chatting**:
-    The chatbot endpoint will now utilize the `retrieveContext` function before calling Gemini.
+### Starting the Environment
+Ensure Qdrant is running:
+```bash
+docker-compose up -d
+```
