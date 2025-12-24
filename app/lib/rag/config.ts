@@ -14,7 +14,7 @@ export const RAG_CONFIG = {
         vectorSize: 768, // Dimensions for text-embedding-3-small or Gemini equivalent
     },
     model: {
-        name: "gemini-3-flash-preview",
+        name: "gemini-2.5-flash",
         embedding: "text-embedding-004",
     }
 };
