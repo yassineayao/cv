@@ -15,7 +15,11 @@ import {
     X,
     LogOut,
     Bot,
-    Search
+    Search,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -53,6 +57,12 @@ interface Visit {
 
 interface AnalyticsData {
     visits: Visit[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
     stats: {
         totalVisits: number;
         topCountries: { name: string; count: number }[];
@@ -69,6 +79,12 @@ export default function AdminDashboard() {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
+
+    // Pagination state
+    const [analyticsPage, setAnalyticsPage] = useState(1);
+    const [knowledgePage, setKnowledgePage] = useState(1);
+    const itemsPerPage = 8;
+
     const router = useRouter();
 
     // Preview state
@@ -92,13 +108,14 @@ export default function AdminDashboard() {
         }
     };
 
-    const fetchAnalytics = async () => {
+    const fetchAnalytics = async (page = 1, search = searchTerm) => {
         try {
             setAnalyticsLoading(true);
-            const res = await fetch('/api/admin/analytics');
+            const res = await fetch(`/api/admin/analytics?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(search)}`);
             const data = await res.json();
             if (data.error) throw new Error(data.error);
             setAnalytics(data);
+            setAnalyticsPage(page);
         } catch (error) {
             console.error(error);
             setMessage({ type: 'error', text: "Failed to load analytics data." });
@@ -108,10 +125,19 @@ export default function AdminDashboard() {
     };
 
     useEffect(() => {
+        if (activeTab === 'analytics') {
+            const timer = setTimeout(() => {
+                fetchAnalytics(1, searchTerm);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [searchTerm]);
+
+    useEffect(() => {
         if (activeTab === 'knowledge') {
             fetchData();
-        } else {
-            fetchAnalytics();
+        } else if (activeTab === 'analytics') {
+            fetchAnalytics(1);
         }
     }, [activeTab]);
 
@@ -180,6 +206,75 @@ export default function AdminDashboard() {
     const handleLogout = async () => {
         await signOut({ callbackUrl: "/login" });
     };
+
+    const Pagination = ({
+        currentPage,
+        totalPages,
+        onPageChange,
+        totalItems,
+        label
+    }: {
+        currentPage: number;
+        totalPages: number;
+        onPageChange: (page: number) => void;
+        totalItems: number;
+        label: string;
+    }) => {
+        if (totalPages <= 1) return null;
+
+        return (
+            <div className="px-6 py-4 border-t bg-muted/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="text-xs text-muted-foreground font-medium">
+                    Showing <span className="text-foreground">{Math.min(itemsPerPage * currentPage, totalItems)}</span> of <span className="text-foreground">{totalItems}</span> {label}
+                </div>
+                <div className="flex items-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-primary"
+                        onClick={() => onPageChange(1)}
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronsLeft className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-primary"
+                        onClick={() => onPageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                    </Button>
+
+                    <div className="flex items-center px-4 h-8 bg-primary/10 rounded-lg border border-primary/20 text-xs font-bold text-primary">
+                        Page {currentPage} of {totalPages}
+                    </div>
+
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-primary"
+                        onClick={() => onPageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        <ChevronRight className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-primary"
+                        onClick={() => onPageChange(totalPages)}
+                        disabled={currentPage === totalPages}
+                    >
+                        <ChevronsRight className="w-4 h-4" />
+                    </Button>
+                </div>
+            </div>
+        );
+    };
+
+    const paginatedSources = sources.slice((knowledgePage - 1) * itemsPerPage, knowledgePage * itemsPerPage);
 
     return (
         <div className="min-h-screen bg-background p-6 font-sans relative">
@@ -258,7 +353,7 @@ export default function AdminDashboard() {
                         {activeTab === 'analytics' && (
                             <Button
                                 variant="secondary"
-                                onClick={fetchAnalytics}
+                                onClick={() => fetchAnalytics(1)}
                                 disabled={analyticsLoading}
                                 className="flex-1 sm:flex-none bg-primary/20 text-foreground hover:bg-primary/30 border border-primary/30 font-bold transition-all shadow-glow-primary/20"
                             >
@@ -351,7 +446,7 @@ export default function AdminDashboard() {
                                                 </td>
                                             </tr>
                                         ) : (
-                                            sources.map((source) => (
+                                            paginatedSources.map((source) => (
                                                 <tr key={source.filename} className="hover:bg-muted/10 transition-colors group">
                                                     <td className="px-6 py-4 max-w-[150px] sm:max-w-none">
                                                         <div className="flex items-center gap-2 overflow-hidden">
@@ -408,6 +503,13 @@ export default function AdminDashboard() {
                                     </tbody>
                                 </table>
                             </div>
+                            <Pagination
+                                currentPage={knowledgePage}
+                                totalPages={Math.ceil(sources.length / itemsPerPage)}
+                                onPageChange={setKnowledgePage}
+                                totalItems={sources.length}
+                                label="documents"
+                            />
                         </Card>
                     </>
                 ) : (
@@ -483,12 +585,6 @@ export default function AdminDashboard() {
                                             </tr>
                                         ) : (
                                             analytics.visits
-                                                .filter(visit =>
-                                                    visit.ip.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                                    visit.path.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                                    (visit.country || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                                    (visit.city || "").toLowerCase().includes(searchTerm.toLowerCase())
-                                                )
                                                 .map((visit) => (
                                                     <tr key={visit.id} className="hover:bg-muted/10 transition-colors">
                                                         <td className="px-6 py-4 text-xs font-mono text-muted-foreground whitespace-nowrap">
@@ -500,14 +596,14 @@ export default function AdminDashboard() {
                                                                 {visit.city ? `${visit.city}, ${visit.country}` : visit.country || "Unknown Location"}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 hidden md:table-cell">
-                                                            <div className="text-xs font-medium uppercase">{visit.device}</div>
-                                                            <div className="text-[10px] text-muted-foreground">{visit.browser} / {visit.os}</div>
+                                                        <td className="px-6 py-4 hidden md:table-cell whitespace-nowrap overflow-hidden max-w-[120px]">
+                                                            <div className="text-xs truncate">{visit.device || "Unknown Device"}</div>
+                                                            <div className="text-[10px] text-muted-foreground truncate">{visit.os} / {visit.browser}</div>
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <Badge variant="outline" className="text-[10px] font-mono">
+                                                            <div className="text-xs truncate max-w-[150px] font-mono group-hover:text-primary transition-colors">
                                                                 {visit.path}
-                                                            </Badge>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))
@@ -515,6 +611,15 @@ export default function AdminDashboard() {
                                     </tbody>
                                 </table>
                             </div>
+                            {analytics && (
+                                <Pagination
+                                    currentPage={analyticsPage}
+                                    totalPages={analytics.pagination.totalPages}
+                                    onPageChange={(page) => fetchAnalytics(page, searchTerm)}
+                                    totalItems={analytics.pagination.total}
+                                    label="results"
+                                />
+                            )}
                         </Card>
                     </>
                 )}
