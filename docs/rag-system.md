@@ -33,12 +33,18 @@ graph TD
 
 ## Tech Stack
 
-- **Framework**: Next.js 16
+- **Framework**: Next.js 15
 - **AI SDK**: Vercel AI SDK (`ai`, `@ai-sdk/google`)
-- **LLM**: Google `gemini-3-flash-preview`
+- **LLM**: Google `gemini-2.5-flash`
 - **Vector DB**: Qdrant (Dockerized)
 - **Embeddings**: Google `text-embedding-004` (via AI SDK)
 - **Local Reranker**: `@xenova/transformers` (TinyBERT)
+
+> [!NOTE]
+> For more detailed visuals and flows, see:
+> - [AI Story Advisor Guide](file:///home/dev/projects/cv/docs/AI_STORY_ADVISOR.md)
+> - [RAG Flows & Diagrams](file:///home/dev/projects/cv/docs/RAG_FLOWS.md)
+> - [Practical Use Cases](file:///home/dev/projects/cv/docs/USE_CASES.md)
 
 ---
 

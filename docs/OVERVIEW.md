@@ -286,6 +286,9 @@ If you want to see my quests in action or reach me for collaboration:
 **Theme:** “The wise advisor”
 **Illustration:** A floating, ancient scroll that contains the knowledge of all previous chapters.
 
+> [!TIP]
+> **Complete Documentation**: Check out the [AI Story Advisor Guide](file:///home/dev/projects/cv/docs/AI_STORY_ADVISOR.md) for architecture, [RAG Flows](file:///home/dev/projects/cv/docs/RAG_FLOWS.md) for data diagrams, and [Use Cases](file:///home/dev/projects/cv/docs/USE_CASES.md) for interaction examples.
+
 **Text:**
 ```
 Still have questions? Consult the AI Scroll. It has deep knowledge of Yassine's journey, from his Master's degree to his latest RAG implementation.
