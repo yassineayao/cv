@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Bot, Lock, User, LifeBuoy } from "lucide-react";
 import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
     const [username, setUsername] = useState("admin");
@@ -21,13 +22,22 @@ export default function LoginPage() {
         setIsLoading(true);
         setError("");
 
-        // Simple login logic for demonstration
-        if (username === "admin" && password === "password") {
-            // Set a cookie (plain JS for simplicity, normally use a library)
-            document.cookie = "auth_session=true; path=/; max-age=86400"; // 24 hours
-            router.push("/admin");
-        } else {
-            setError("Invalid username or password");
+        try {
+            const result = await signIn("credentials", {
+                username,
+                password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError("Invalid username or password");
+                setIsLoading(false);
+            } else {
+                router.push("/admin");
+                router.refresh();
+            }
+        } catch (err) {
+            setError("An unexpected error occurred");
             setIsLoading(false);
         }
     };

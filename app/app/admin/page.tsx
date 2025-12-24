@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -131,9 +132,8 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleLogout = () => {
-        document.cookie = "auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        router.push("/login");
+    const handleLogout = async () => {
+        await signOut({ callbackUrl: "/login" });
     };
 
     return (

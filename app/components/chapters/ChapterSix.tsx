@@ -1,7 +1,7 @@
 
 import React from "react";
 import { StoryCard } from "@/components/ui/story-card";
-import { GraduationCap, Library, Book } from "lucide-react";
+import { GraduationCap, Library } from "lucide-react";
 import { config } from "@/lib/config";
 
 export function ChapterSix() {
@@ -38,9 +38,14 @@ export function ChapterSix() {
             <div className="flex-shrink-0 flex justify-center p-4 sm:p-8 animate-in slide-in-from-right duration-700 delay-200 order-1 md:order-2">
                 <div className="relative">
                     <div className="absolute -top-6 sm:-top-10 -left-6 sm:-left-10 text-6xl sm:text-9xl font-serif text-primary/5">"</div>
-                    <div className="w-40 h-52 sm:w-64 sm:h-80 bg-primary/80 rounded-r-3xl rounded-bl-3xl shadow-2xl skew-y-3 flex items-center justify-center relative overlow-hidden transform transition-all hover:skew-y-0">
-                        <div className="absolute inset-1.5 sm:inset-2 border-2 border-white/20 rounded-r-2xl rounded-bl-2xl"></div>
-                        <Book className="w-20 h-20 sm:w-32 sm:h-32 text-white" />
+                    <div className="w-44 h-56 sm:w-72 sm:h-96 bg-primary/10 rounded-2xl shadow-2xl skew-y-3 relative overflow-hidden transform transition-all hover:skew-y-0 group border border-primary/20">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent z-10 opacity-60 group-hover:opacity-20 transition-opacity" />
+                        <img
+                            src="/assets/chapter6.png"
+                            alt="Education"
+                            className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
+                        />
+                        <div className="absolute inset-2 border border-white/30 rounded-xl z-20 pointer-events-none" />
                     </div>
                 </div>
             </div>
