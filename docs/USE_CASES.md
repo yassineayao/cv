@@ -28,7 +28,7 @@ The AI Story Advisor is designed to provide value across several common user int
 | "What's your preferred tech stack?" | Retrieve "Core Competencies" table. | Highlights Node.js, Next.js, and PostgreSQL as favorites. |
 | "How do you handle complex business logic?" | Retrieve "Highlights" of Current Project (Domain Driven Design). | Discusses implementation of DDD for the current tourism project. |
 
-## 🌟 Interaction Tips for Best Results
+## 🌟 Interaction Trips for Best Results
 - **First Person**: Always speak to the bot as if you are talking to Yassine.
 - **Specifics**: Asking about specific technologies (e.g., "Prisma", "Tailwind") yields very precise answers due to the **Sparse Index**.
 - **Contextual Awareness**: The bot remembers previous messages in the conversation to maintain flow.

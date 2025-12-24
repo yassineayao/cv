@@ -73,7 +73,7 @@ Do you want me to do that next?
    * Text:
 
      ```
-     Currently, I am developing a tips management app for a tourism agency. 
+     Currently, I am developing a trips management app for a tourism agency. 
      Stack: Node.js, Next.js, PostgreSQL, Docker, Expo (mobile). 
      Biggest challenge: scalability, solved via Domain Driven Design. 
      I manage the full product from A to Z.
@@ -225,7 +225,7 @@ If you want to see my quests in action or reach me for collaboration:
 * **Text:**
 
   ```
-  Currently, I am developing a tips management app for a tourism agency. 
+  Currently, I am developing a trips management app for a tourism agency. 
   Stack: Node.js, Next.js, PostgreSQL, Docker, Expo (mobile). 
   Biggest challenge: scalability, solved via Domain Driven Design. 
   I manage the full product from A to Z.

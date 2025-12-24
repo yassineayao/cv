@@ -79,8 +79,8 @@ export const config = {
     // ============================================
     currentProject: {
         title: "Current Adventure",
-        projectName: "Tourism Tips App",
-        description: "Currently, I am developing a tips management app for a tourism agency. I manage the full product from A to Z, solving scalability challenges via Domain Driven Design.",
+        projectName: "Tourism Trips App",
+        description: "Currently, I am developing a trips management app for a tourism agency. I manage the full product from A to Z, solving scalability challenges via Domain Driven Design.",
         technologies: ["Node.js", "Next.js", "PostgreSQL", "Docker", "Expo"],
     },
 

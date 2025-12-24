@@ -73,7 +73,7 @@ This document outlines the step-by-step implementation plan for the Storybook CV
 
 ### 5. Chapter 4: Current Adventure
 *   **Component:** `components/chapters/ChapterFour.tsx`
-*   **Theme:** Epic project in progress (Tips Management App).
+*   **Theme:** Epic project in progress (Trips Management App).
 *   **Features:**
     *   Architectural diagram using simple SVG or DOM elements (DDD blocks).
     *   Interactive elements explaining "Scalability" and "Full Product Management".
