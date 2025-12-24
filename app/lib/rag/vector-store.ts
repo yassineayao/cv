@@ -113,3 +113,73 @@ export const searchHybrid = async (
         with_payload: true,
     });
 };
+
+export const getCollectionStats = async () => {
+    const client = getQdrantClient();
+    const collectionName = RAG_CONFIG.qdrant.collectionName;
+    try {
+        const info = await client.getCollection(collectionName);
+        return {
+            pointsCount: info.points_count,
+            status: info.status,
+        };
+    } catch (error) {
+        console.error("Error getting stats:", error);
+        return { pointsCount: 0, status: "error" };
+    }
+};
+
+export const listUniqueSources = async () => {
+    const client = getQdrantClient();
+    const collectionName = RAG_CONFIG.qdrant.collectionName;
+
+    try {
+        // We use scroll to get points and then extract unique filenames
+        // Note: For large collections, grouping or a separate index would be better
+        const result = await client.scroll(collectionName, {
+            with_payload: true,
+            limit: 1000, // Reasonable limit for portfolio
+        });
+
+        const sources = new Map<string, { filename: string; count: number; sourceType: string }>();
+
+        result.points.forEach((point) => {
+            const payload = point.payload as any;
+            if (payload && payload.filename) {
+                const existing = sources.get(payload.filename);
+                if (existing) {
+                    existing.count++;
+                } else {
+                    sources.set(payload.filename, {
+                        filename: payload.filename,
+                        count: 1,
+                        sourceType: payload.sourceType || "unknown",
+                    });
+                }
+            }
+        });
+
+        return Array.from(sources.values());
+    } catch (error) {
+        console.error("Error listing sources:", error);
+        return [];
+    }
+};
+
+export const deleteByFilename = async (filename: string) => {
+    const client = getQdrantClient();
+    const collectionName = RAG_CONFIG.qdrant.collectionName;
+
+    await client.delete(collectionName, {
+        filter: {
+            must: [
+                {
+                    key: "filename",
+                    match: {
+                        value: filename,
+                    },
+                },
+            ],
+        },
+    });
+};
