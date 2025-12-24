@@ -318,6 +318,7 @@ export function ChatBot() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={toggleChat}
+                    data-tour="chatbot"
                     className={cn(
                         "relative w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300",
                         isOpen

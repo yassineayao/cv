@@ -15,6 +15,7 @@ export function ThemeToggle() {
             onClick={toggleTheme}
             className="fixed top-4 right-4 z-50 rounded-full shadow-lg hover:shadow-glow-primary transition-all"
             aria-label="Toggle theme"
+            data-tour="theme-toggle"
         >
             {theme === "light" ? (
                 <Moon className="h-5 w-5" />

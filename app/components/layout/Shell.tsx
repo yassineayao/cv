@@ -59,36 +59,29 @@ export function Shell({ children, className, ...props }: ShellProps) {
     };
 
     return (
-        <div
-            data-scroll-container
-            className={cn(
-                "h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth relative",
-                "bg-background text-foreground",
-                className
-            )}
-            {...props}
-        >
-            {/* Navigation Dots with Hover Titles */}
-            <div className="fixed right-2 md:right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3 z-50 hidden sm:flex">
-                {Array.from({ length: totalSections }).map((_, i) => (
-                    <div key={i} className="relative group flex items-center justify-end">
-                        {/* Title label - appears on hover */}
-                        <span className="absolute right-full mr-3 px-3 py-1.5 text-sm font-medium bg-card/95 backdrop-blur border rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0 pointer-events-none">
-                            {sectionTitles[i]}
-                        </span>
+        <div className="relative h-screen w-full overflow-hidden bg-background text-foreground">
+            {/* Fixed Navigation Elements - Outside scroll container for better tour targeting */}
+            <div className="fixed right-2 md:right-6 inset-y-0 flex items-center z-50 hidden sm:flex pointer-events-none">
+                <div data-tour="nav-dots" className="flex flex-col gap-2 md:gap-3 p-2 min-w-[32px] items-center pointer-events-auto">
+                    {Array.from({ length: totalSections }).map((_, i) => (
+                        <div key={i} className="relative group flex items-center justify-end">
+                            <span className="absolute right-full mr-3 px-3 py-1.5 text-sm font-medium bg-card/95 backdrop-blur border rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0 pointer-events-none">
+                                {sectionTitles[i]}
+                            </span>
 
-                        <button
-                            onClick={() => scrollToSection(i)}
-                            className={cn(
-                                "w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 hover:scale-150",
-                                activeSection === i
-                                    ? "bg-primary w-6 md:w-8 shadow-glow-primary"
-                                    : "bg-primary/20 hover:bg-primary/50"
-                            )}
-                            aria-label={`Go to ${sectionTitles[i]}`}
-                        />
-                    </div>
-                ))}
+                            <button
+                                onClick={() => scrollToSection(i)}
+                                className={cn(
+                                    "w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 hover:scale-150",
+                                    activeSection === i
+                                        ? "bg-primary w-6 md:w-8 shadow-glow-primary"
+                                        : "bg-primary/20 hover:bg-primary/50"
+                                )}
+                                aria-label={`Go to ${sectionTitles[i]}`}
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Scroll Progress Bar */}
@@ -113,7 +106,17 @@ export function Shell({ children, className, ...props }: ShellProps) {
                 <ChevronUp className="w-6 h-6" />
             </button>
 
-            {children}
+            {/* Main Scrollable Content */}
+            <div
+                data-scroll-container
+                className={cn(
+                    "h-full w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth",
+                    className
+                )}
+                {...props}
+            >
+                {children}
+            </div>
         </div>
     );
 }
