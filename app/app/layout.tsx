@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 };
 
 import { VisitTracker } from "@/components/layout/VisitTracker";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -31,12 +32,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased font-sans`}
       >
-        <VisitTracker />
-        {children}
+        <ThemeProvider>
+          <VisitTracker />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

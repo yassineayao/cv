@@ -196,19 +196,25 @@ export default function AdminDashboard() {
                         </h1>
                     </div>
                     <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
-                        <div className="bg-muted p-1 rounded-lg flex gap-1 mr-2">
+                        <div className="bg-muted/50 p-1 rounded-lg flex gap-1 mr-2 border border-border/50">
                             <Button
-                                variant={activeTab === 'knowledge' ? 'secondary' : 'ghost'}
+                                variant={activeTab === 'knowledge' ? 'default' : 'ghost'}
                                 size="sm"
-                                className="h-8 text-xs font-bold"
+                                className={cn(
+                                    "h-8 text-xs font-bold transition-all",
+                                    activeTab === 'knowledge' ? "shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                )}
                                 onClick={() => setActiveTab('knowledge')}
                             >
                                 Knowledge
                             </Button>
                             <Button
-                                variant={activeTab === 'analytics' ? 'secondary' : 'ghost'}
+                                variant={activeTab === 'analytics' ? 'default' : 'ghost'}
                                 size="sm"
-                                className="h-8 text-xs font-bold"
+                                className={cn(
+                                    "h-8 text-xs font-bold transition-all",
+                                    activeTab === 'analytics' ? "shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                )}
                                 onClick={() => setActiveTab('analytics')}
                             >
                                 Analytics
@@ -229,12 +235,12 @@ export default function AdminDashboard() {
                                     variant="outline"
                                     onClick={() => document.getElementById('file-upload')?.click()}
                                     disabled={!!actionLoading}
-                                    className="flex-1 sm:flex-none"
+                                    className="flex-1 sm:flex-none border-primary/40 bg-primary/5 hover:bg-primary/20 transition-all font-bold"
                                 >
                                     {actionLoading === 'upload' ? (
-                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin text-primary" />
                                     ) : (
-                                        <Plus className="w-4 h-4 mr-2" />
+                                        <Plus className="w-4 h-4 mr-2 text-primary" />
                                     )}
                                     Upload File
                                 </Button>
@@ -251,13 +257,13 @@ export default function AdminDashboard() {
 
                         {activeTab === 'analytics' && (
                             <Button
-                                variant="outline"
+                                variant="secondary"
                                 onClick={fetchAnalytics}
                                 disabled={analyticsLoading}
-                                className="flex-1 sm:flex-none"
+                                className="flex-1 sm:flex-none bg-primary/20 text-foreground hover:bg-primary/30 border border-primary/30 font-bold transition-all shadow-glow-primary/20"
                             >
-                                <RefreshCw className={cn("w-4 h-4 mr-2", analyticsLoading && "animate-spin")} />
-                                Refresh
+                                <RefreshCw className={cn("w-4 h-4 mr-2 text-primary", analyticsLoading && "animate-spin")} />
+                                Refresh Status
                             </Button>
                         )}
 
