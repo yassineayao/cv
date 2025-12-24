@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Storybook CV - Frontend Application
 
-## Getting Started
+This directory contains the Next.js frontend and API services for the Storybook CV.
 
-First, run the development server:
+## 📖 Project Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+For the complete project concept, full architecture, and local environment setup instructions, please refer to the **[Root README](../README.md)**.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠 Tech Stack (App Level)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend**: Next.js 16 (App Router), Tailwind CSS, Framer Motion, Shadcn UI.
+- **AI Integration**: Vercel AI SDK, Google Gemini API.
+- **Data Persistence**: Prisma + PostgreSQL.
+- **RAG Implementation**: Local Qdrant integration via `app/lib/rag`.
 
-## Learn More
+## 🚀 Scripts
 
-To learn more about Next.js, take a look at the following resources:
+From this directory (`/app`), you can run:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `bun dev`: Starts the development server.
+- `bun build`: Builds the application for production.
+- `bun lint`: Runs ESLint for code quality checks.
+- `bun scripts/ingest-kb.ts`: Ingests the Markdown files from `docs/` into the Qdrant vector database.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📂 Internal Directory Structure
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/`: Next.js App Router pages and layouts.
+- `components/`:
+  - `ui/`: Shared UI components (Shadcn).
+  - `layout/`: Main PageShell, ChatBot, and TourGuide components.
+- `lib/`:
+  - `rag/`: Core RAG logic (retrieval, ingestion, hybrid search).
+  - `prisma/`: Prisma client and database utilities.
+- `prisma/`: Database schema definitions.
+- `public/`: Static assets and knowledge base Markdown files.
+- `scripts/`: Maintenance and data ingestion scripts.
