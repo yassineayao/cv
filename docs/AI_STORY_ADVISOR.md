@@ -51,8 +51,8 @@ graph TD
 
 ## 📂 Documentation Directory
 
-1. [RAG Flows](file:///home/dev/projects/cv/docs/RAG_FLOWS.md) - Detailed explanation of data movement.
-2. [Use Cases](file:///home/dev/projects/cv/docs/USE_CASES.md) - Practical examples and interaction patterns.
-3. [Architecture Deep Dive](file:///home/dev/projects/cv/docs/rag-system.md) - Legacy system overview (updated).
-4. [Conceptual Background](file:///home/dev/projects/cv/docs/rag-concepts.md) - Why we use Hybrid search and Reranking.
-5. [Admin Dashboard](file:///home/dev/projects/cv/docs/ADMIN_DASHBOARD.md) - How to manage the knowledge base.
+1. [RAG Flows](./RAG_FLOWS.md) - Detailed explanation of data movement.
+2. [Use Cases](./USE_CASES.md) - Practical examples and interaction patterns.
+3. [Architecture Deep Dive](./rag-system.md) - Legacy system overview (updated).
+4. [Conceptual Background](./rag-concepts.md) - Why we use Hybrid search and Reranking.
+5. [Admin Dashboard](./ADMIN_DASHBOARD.md) - How to manage the knowledge base.

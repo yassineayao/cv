@@ -42,9 +42,9 @@ graph TD
 
 > [!NOTE]
 > For more detailed visuals and flows, see:
-> - [AI Story Advisor Guide](file:///home/dev/projects/cv/docs/AI_STORY_ADVISOR.md)
-> - [RAG Flows & Diagrams](file:///home/dev/projects/cv/docs/RAG_FLOWS.md)
-> - [Practical Use Cases](file:///home/dev/projects/cv/docs/USE_CASES.md)
+> - [AI Story Advisor Guide](./AI_STORY_ADVISOR.md)
+> - [RAG Flows & Diagrams](./RAG_FLOWS.md)
+> - [Practical Use Cases](./USE_CASES.md)
 
 ---
 
@@ -78,9 +78,10 @@ graph TD
     - Compares the query directly with candidate documents to ensure relevance.
 
 ### 4. Generator (Chatbot)
-**Path**: `app/api/chat/route.ts`
-- Uses `streamText` from Vercel AI SDK.
-- Constructs a system prompt injecting the **retrieved context** dynamically.
+**Path**: `app/api/chat/route.ts` & `components/layout/ChatBot.tsx`
+- **Backend**: Uses `streamText` from Vercel AI SDK to generate responses with context.
+- **Frontend**: Custom implementation (bypassing `useChat` hook's fetch) to ensure robust Session ID tracking and database logging.
+- **Documentation**: See [Chatbot Implementation Guide](./CHATBOT_IMPLEMENTATION.md) for deep dive.
 
 ---
 
