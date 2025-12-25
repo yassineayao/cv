@@ -10,15 +10,30 @@ import { headers } from 'next/headers';
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { messages, sessionId }: { messages: UIMessage[], sessionId?: string } = await req.json();
+  const body = await req.json();
+  console.log('📨 Received chat request body:', JSON.stringify(body, null, 2));
+
+  let { messages, sessionId }: { messages: UIMessage[], sessionId?: string } = body;
+
+  // Fallback: check headers if sessionId not in body
+  if (!sessionId) {
+    sessionId = req.headers.get('X-Session-ID') || undefined;
+    console.log('🔍 SessionId from header:', sessionId);
+  }
+
+  console.log('🔑 Session ID:', sessionId);
+  console.log('💬 Messages count:', messages?.length);
+
   const lastMessage = messages[messages.length - 1];
 
   // Extract text from the last message
   const textPart = lastMessage.parts?.find((part: any) => part.type === 'text') as any;
   const lastMessageText = textPart?.text || '';
+  console.log('📝 Last message text:', lastMessageText);
 
   // 0. Log Session and User Message
   if (sessionId) {
+    console.log('✅ SessionId exists, attempting to log to database...');
     try {
       // Get visitor metadata (IP, location, etc)
       const metadata = await getVisitMetadata('/api/chat');
@@ -40,6 +55,7 @@ export async function POST(req: Request) {
           updatedAt: new Date(),
         }
       });
+      console.log('✅ Chat session upserted successfully');
 
       // Log User Message
       await prisma.chatMessage.create({
@@ -49,9 +65,12 @@ export async function POST(req: Request) {
           content: lastMessageText,
         },
       });
+      console.log('✅ User message logged successfully');
     } catch (error) {
-      console.error("Failed to log chat interaction:", error);
+      console.error("❌ Failed to log chat interaction:", error);
     }
+  } else {
+    console.log('⚠️ No sessionId provided, skipping database logging');
   }
 
   // 1. Retrieve Context
@@ -115,8 +134,9 @@ Remember: You ARE Yassine. Respond naturally as if having a conversation with a 
               content: event.text,
             },
           });
+          console.log('✅ Assistant message logged successfully');
         } catch (e) {
-          console.error("Failed to log assistant response:", e);
+          console.error("❌ Failed to log assistant response:", e);
         }
       }
     }

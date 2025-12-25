@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { useChat } from "@ai-sdk/react";
 import { Scroll, X, Send, Bot, User, Loader2, Sparkles, MessageCircle, Maximize2, Minimize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -17,16 +16,27 @@ const SUGGESTED_PROMPTS = [
     "Are you available for hire?",
 ];
 
+interface Message {
+    id: string;
+    role: 'user' | 'assistant';
+    parts: Array<{ type: string; text: string; state?: string }>;
+}
+
 export function ChatBot() {
     const [isOpen, setIsOpen] = useState(false);
     const [localInput, setLocalInput] = useState("");
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // Generate session ID once on mount
     const [sessionId] = useState(() => {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('chatSessionId') || uuidv4();
+            const existingId = localStorage.getItem('chatSessionId');
+            const newId = existingId || uuidv4();
+            console.log('Chat Session ID:', newId);
+            return newId;
         }
         return '';
     });
@@ -34,12 +44,10 @@ export function ChatBot() {
     useEffect(() => {
         if (sessionId) {
             localStorage.setItem('chatSessionId', sessionId);
+            console.log('Saved sessionId to localStorage:', sessionId);
         }
     }, [sessionId]);
 
-    const { messages, sendMessage, isLoading } = useChat({
-        body: { sessionId }
-    } as any) as any;
     const [showPulse, setShowPulse] = useState(true);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -61,8 +69,113 @@ export function ChatBot() {
 
     const toggleChat = () => setIsOpen(!isOpen);
 
+    const sendMessage = async (text: string) => {
+        if (!text.trim() || isLoading) return;
+
+        console.log('Sending message with sessionId:', sessionId);
+
+        // Add user message
+        const userMessage: Message = {
+            id: uuidv4(),
+            role: 'user',
+            parts: [{ type: 'text', text }]
+        };
+
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: updatedMessages,
+                    sessionId: sessionId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+
+            if (!reader) {
+                throw new Error('No reader available');
+            }
+
+            let assistantText = '';
+            const assistantId = uuidv4();
+            let buffer = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+
+                // Keep the last incomplete line in the buffer
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+
+                    // AI SDK streams data in format: "data: " followed by JSON
+                    if (line.startsWith('data: ')) {
+                        // Skip the [DONE] marker
+                        if (line.includes('[DONE]')) continue;
+
+                        try {
+                            const jsonStr = line.substring(6); // Remove "data: " prefix
+                            const parsed = JSON.parse(jsonStr);
+
+                            // Handle text-delta events which contain the actual text chunks
+                            if (parsed.type === 'text-delta' && parsed.delta) {
+                                assistantText += parsed.delta;
+
+                                // Update assistant message
+                                setMessages([...updatedMessages, {
+                                    id: assistantId,
+                                    role: 'assistant',
+                                    parts: [{ type: 'text', text: assistantText, state: 'done' }]
+                                }]);
+                            }
+                        } catch (e) {
+                            console.error('Parse error:', e, 'Line:', line.substring(0, 50));
+                        }
+                    }
+                }
+            }
+
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error sending message:', error);
+            setIsLoading(false);
+
+            // Add error message
+            setMessages([...updatedMessages, {
+                id: uuidv4(),
+                role: 'assistant',
+                parts: [{ type: 'text', text: 'Sorry, I encountered an error. Please try again.', state: 'done' }]
+            }]);
+        }
+    };
+
     const handleSuggestedPrompt = (prompt: string) => {
-        sendMessage({ text: prompt });
+        sendMessage(prompt);
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (localInput.trim() && !isLoading) {
+            sendMessage(localInput);
+            setLocalInput("");
+        }
     };
 
     return (
@@ -166,10 +279,10 @@ export function ChatBot() {
                                     </motion.div>
                                 )}
 
-                                {messages.map((m: any, index: number) => {
+                                {messages.map((m, index) => {
                                     const isLastMessage = index === messages.length - 1;
                                     const isAssistantMessage = m.role === "assistant";
-                                    const messageText = m.parts?.find((p: any) => p.type === 'text')?.text || m.content || '';
+                                    const messageText = m.parts?.find((p) => p.type === 'text')?.text || '';
                                     const showTypingInBubble = isLastMessage && isAssistantMessage && isLoading && !messageText;
 
                                     return (
@@ -202,7 +315,6 @@ export function ChatBot() {
                                                 )}
                                             >
                                                 {showTypingInBubble ? (
-                                                    // Typing animation inside the bubble
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs text-muted-foreground font-medium">
                                                             Typing
@@ -226,20 +338,10 @@ export function ChatBot() {
                                                         </div>
                                                     </div>
                                                 ) : m.role === "user" ? (
-                                                    m.parts?.map((part: any, i: number) => {
-                                                        if (part.type === 'text') {
-                                                            return <div key={i}>{part.text}</div>;
-                                                        }
-                                                        return null;
-                                                    }) || m.content
+                                                    <div>{messageText}</div>
                                                 ) : (
                                                     <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2 prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-muted prose-pre:p-2 prose-pre:rounded-lg">
-                                                        {m.parts?.map((part: any, i: number) => {
-                                                            if (part.type === 'text') {
-                                                                return <ReactMarkdown key={i}>{part.text}</ReactMarkdown>;
-                                                            }
-                                                            return null;
-                                                        }) || <ReactMarkdown>{m.content}</ReactMarkdown>}
+                                                        <ReactMarkdown>{messageText}</ReactMarkdown>
                                                     </div>
                                                 )}
                                             </div>
@@ -287,13 +389,7 @@ export function ChatBot() {
 
                             {/* Input */}
                             <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    if (localInput.trim() && !isLoading) {
-                                        sendMessage({ text: localInput });
-                                        setLocalInput("");
-                                    }
-                                }}
+                                onSubmit={handleSubmit}
                                 className="p-4 border-t bg-card/50 backdrop-blur-sm flex items-center gap-3"
                             >
                                 <input

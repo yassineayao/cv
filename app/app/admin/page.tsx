@@ -15,11 +15,17 @@ import {
     X,
     LogOut,
     Bot,
+    MessageSquare,
     Search,
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
-    ChevronsRight
+    ChevronsRight,
+    User,
+    Monitor,
+    Globe,
+    Clock,
+    Smartphone
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -69,13 +75,46 @@ interface AnalyticsData {
     };
 }
 
+interface ChatMessage {
+    id: string;
+    role: string;
+    content: string;
+    createdAt: string;
+}
+
+interface ChatSession {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    ip: string | null;
+    country: string | null;
+    city: string | null;
+    region: string | null;
+    device: string | null;
+    browser: string | null;
+    os: string | null;
+    messages: ChatMessage[];
+}
+
+interface ChatLogsData {
+    sessions: ChatSession[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState<'knowledge' | 'analytics'>('knowledge');
+    const [activeTab, setActiveTab] = useState<'knowledge' | 'analytics' | 'chats'>('knowledge');
     const [sources, setSources] = useState<Source[]>([]);
     const [stats, setStats] = useState<Stats>({ pointsCount: 0, status: "idle" });
     const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+    const [chatLogs, setChatLogs] = useState<ChatLogsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [analyticsLoading, setAnalyticsLoading] = useState(false);
+    const [chatsLoading, setChatsLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -83,6 +122,7 @@ export default function AdminDashboard() {
     // Pagination state
     const [analyticsPage, setAnalyticsPage] = useState(1);
     const [knowledgePage, setKnowledgePage] = useState(1);
+    const [chatPage, setChatPage] = useState(1);
     const itemsPerPage = 8;
 
     const router = useRouter();
@@ -91,6 +131,9 @@ export default function AdminDashboard() {
     const [previewContent, setPreviewContent] = useState<string | null>(null);
     const [previewFilename, setPreviewFilename] = useState<string | null>(null);
     const [previewLoading, setPreviewLoading] = useState(false);
+
+    // Chat logs - selected user state
+    const [selectedUserIp, setSelectedUserIp] = useState<string | null>(null);
 
     const fetchData = async () => {
         try {
@@ -124,10 +167,31 @@ export default function AdminDashboard() {
         }
     };
 
+    const fetchChatLogs = async (page = 1, search = searchTerm) => {
+        try {
+            setChatsLoading(true);
+            const res = await fetch(`/api/admin/chat-logs?page=${page}&limit=${itemsPerPage}&search=${encodeURIComponent(search)}`);
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            setChatLogs(data);
+            setChatPage(page);
+        } catch (error) {
+            console.error(error);
+            setMessage({ type: 'error', text: "Failed to load chat logs." });
+        } finally {
+            setChatsLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (activeTab === 'analytics') {
             const timer = setTimeout(() => {
                 fetchAnalytics(1, searchTerm);
+            }, 500);
+            return () => clearTimeout(timer);
+        } else if (activeTab === 'chats') {
+            const timer = setTimeout(() => {
+                fetchChatLogs(1, searchTerm);
             }, 500);
             return () => clearTimeout(timer);
         }
@@ -138,6 +202,8 @@ export default function AdminDashboard() {
             fetchData();
         } else if (activeTab === 'analytics') {
             fetchAnalytics(1);
+        } else if (activeTab === 'chats') {
+            fetchChatLogs(1);
         }
     }, [activeTab]);
 
@@ -315,6 +381,17 @@ export default function AdminDashboard() {
                             >
                                 Analytics
                             </Button>
+                            <Button
+                                variant={activeTab === 'chats' ? 'default' : 'ghost'}
+                                size="sm"
+                                className={cn(
+                                    "h-8 text-xs font-bold transition-all",
+                                    activeTab === 'chats' ? "shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                )}
+                                onClick={() => setActiveTab('chats')}
+                            >
+                                Chats
+                            </Button>
                         </div>
 
                         {activeTab === 'knowledge' && (
@@ -393,7 +470,7 @@ export default function AdminDashboard() {
                     )}
                 </AnimatePresence>
 
-                {activeTab === 'knowledge' ? (
+                {activeTab === 'knowledge' && (
                     <>
                         {/* Knowledge Stats */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -513,7 +590,7 @@ export default function AdminDashboard() {
                             />
                         </Card>
                     </>
-                ) : (
+                )} {activeTab === 'analytics' && (
                     <>
                         {/* Analytics Stats */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -625,6 +702,231 @@ export default function AdminDashboard() {
                     </>
                 )}
 
+                {activeTab === 'chats' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Users List */}
+                        <Card className="overflow-hidden border-primary/10 shadow-xl bg-card/50 backdrop-blur-sm lg:col-span-1">
+                            <div className="p-4 border-b bg-muted/20">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-semibold flex items-center gap-2">
+                                        <User className="w-5 h-5 opacity-70" />
+                                        Users
+                                    </h2>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => fetchChatLogs(chatPage, searchTerm)}
+                                        disabled={chatsLoading}
+                                        className="h-8 w-8"
+                                        title="Refresh Logs"
+                                    >
+                                        <RefreshCw className={cn("w-4 h-4", chatsLoading && "animate-spin")} />
+                                    </Button>
+                                </div>
+                                <div className="relative mt-3">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                    <input
+                                        type="text"
+                                        placeholder="Filter users..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full bg-background border rounded-lg py-2 pl-9 pr-8 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            onClick={() => setSearchTerm("")}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full"
+                                        >
+                                            <X className="w-3 h-3 text-muted-foreground" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="max-h-[600px] overflow-y-auto">
+                                {chatsLoading ? (
+                                    <div className="p-8 text-center text-muted-foreground italic">
+                                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 opacity-50" />
+                                        Loading...
+                                    </div>
+                                ) : !chatLogs || chatLogs.sessions.length === 0 ? (
+                                    <div className="p-8 text-center text-muted-foreground italic">
+                                        No users found.
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-border/40">
+                                        {/* Group sessions by IP to create unique users */}
+                                        {Array.from(
+                                            chatLogs.sessions.reduce((acc, session) => {
+                                                const key = session.ip || 'unknown';
+                                                if (!acc.has(key)) {
+                                                    acc.set(key, {
+                                                        ip: session.ip,
+                                                        country: session.country,
+                                                        city: session.city,
+                                                        device: session.device,
+                                                        browser: session.browser,
+                                                        os: session.os,
+                                                        sessions: [],
+                                                        totalMessages: 0,
+                                                        lastActive: session.updatedAt
+                                                    });
+                                                }
+                                                const user = acc.get(key)!;
+                                                user.sessions.push(session);
+                                                user.totalMessages += session.messages.length;
+                                                if (new Date(session.updatedAt) > new Date(user.lastActive)) {
+                                                    user.lastActive = session.updatedAt;
+                                                }
+                                                return acc;
+                                            }, new Map<string, { ip: string | null; country: string | null; city: string | null; device: string | null; browser: string | null; os: string | null; sessions: ChatSession[]; totalMessages: number; lastActive: string }>())
+                                        ).map(([ip, user]) => (
+                                            <button
+                                                key={ip}
+                                                onClick={() => setSelectedUserIp(ip)}
+                                                className={cn(
+                                                    "w-full p-4 text-left hover:bg-muted/20 transition-colors",
+                                                    selectedUserIp === ip && "bg-primary/10 border-l-2 border-primary"
+                                                )}
+                                            >
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <Globe className="w-3.5 h-3.5 text-primary shrink-0" />
+                                                            <span className="font-medium text-sm truncate">
+                                                                {user.country || "Unknown"}{user.city && `, ${user.city}`}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground font-mono truncate">
+                                                            {user.ip || "No IP"}
+                                                        </div>
+                                                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                                                            <span className="flex items-center gap-1">
+                                                                <Smartphone className="w-3 h-3" />
+                                                                {user.device || "Unknown"}
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                <Monitor className="w-3 h-3" />
+                                                                {user.browser || "Unknown"}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground mt-1">
+                                                            {user.os || "Unknown OS"}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right shrink-0">
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {user.sessions.length} {user.sessions.length === 1 ? 'session' : 'sessions'}
+                                                        </Badge>
+                                                        <div className="text-[10px] text-muted-foreground mt-1">
+                                                            {user.totalMessages} msgs
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            {chatLogs && (
+                                <Pagination
+                                    currentPage={chatPage}
+                                    totalPages={chatLogs.pagination.totalPages}
+                                    onPageChange={(page) => fetchChatLogs(page, searchTerm)}
+                                    totalItems={chatLogs.pagination.total}
+                                    label="sessions"
+                                />
+                            )}
+                        </Card>
+
+                        {/* Sessions & Messages */}
+                        <Card className="overflow-hidden border-primary/10 shadow-xl bg-card/50 backdrop-blur-sm lg:col-span-2">
+                            <div className="p-4 border-b bg-muted/20">
+                                <h2 className="text-lg font-semibold flex items-center gap-2">
+                                    <MessageSquare className="w-5 h-5 opacity-70" />
+                                    {selectedUserIp ? "Conversations" : "Select a User"}
+                                </h2>
+                                {selectedUserIp && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Showing sessions for: <span className="font-mono">{selectedUserIp}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="max-h-[600px] overflow-y-auto">
+                                {!selectedUserIp ? (
+                                    <div className="p-12 text-center text-muted-foreground">
+                                        <User className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                                        <p>Select a user from the list to view their chat sessions.</p>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-border/40">
+                                        {chatLogs?.sessions
+                                            .filter(session => session.ip === selectedUserIp)
+                                            .map((session) => (
+                                                <div key={session.id} className="p-4">
+                                                    {/* Session Header */}
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <Clock className="w-4 h-4 text-primary" />
+                                                            <span className="text-sm font-medium">
+                                                                Session: {new Date(session.createdAt).toLocaleDateString()}
+                                                            </span>
+                                                        </div>
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {session.messages.length} messages
+                                                        </Badge>
+                                                    </div>
+
+                                                    {/* Messages */}
+                                                    <div className="space-y-3 bg-muted/10 p-3 rounded-lg">
+                                                        {session.messages.map((msg) => (
+                                                            <div key={msg.id} className="flex gap-3">
+                                                                {/* Avatar */}
+                                                                <div className={cn(
+                                                                    "w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold",
+                                                                    msg.role === 'user'
+                                                                        ? "bg-muted text-foreground"
+                                                                        : "bg-primary text-primary-foreground"
+                                                                )}>
+                                                                    {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                                                                </div>
+
+                                                                {/* Message Content */}
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                        <span className={cn(
+                                                                            "text-xs font-semibold uppercase",
+                                                                            msg.role === 'user' ? "text-foreground" : "text-primary"
+                                                                        )}>
+                                                                            {msg.role}
+                                                                        </span>
+                                                                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                                            <Clock className="w-3 h-3" />
+                                                                            {new Date(msg.createdAt).toLocaleString()}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className={cn(
+                                                                        "text-sm p-2 rounded-lg",
+                                                                        msg.role === 'user'
+                                                                            ? "bg-muted/50"
+                                                                            : "bg-primary/5 border border-primary/10"
+                                                                    )}>
+                                                                        <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                    </div>
+                                )}
+                            </div>
+                        </Card>
+                    </div>
+                )}
+
                 {/* Footer / Add section */}
                 <div className="text-center pt-4">
                     <p className="text-xs text-muted-foreground">
@@ -681,6 +983,6 @@ export default function AdminDashboard() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 }
