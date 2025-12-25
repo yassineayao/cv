@@ -25,10 +25,12 @@ An intelligent chatbot integrated into the experience.
 - **Knowledge Base**: Fed by detailed Markdown documentation of projects and experiences.
 - **Architecture**: Hybrid Search (Dense + Sparse) with Cross-Encoder Reranking for high precision.
 - **Privacy**: Local retrieval from Qdrant before processing via Gemini API.
+- **Custom Client**: Robust session tracking and connection stability via a custom fetch implementation.
 
 ### 3. Admin Dashboard
 A internal command center for tracking engagement.
 - **Real-time Analytics**: Insights into how visitors interact with the story.
+- **Chat Logs**: Full conversation history grouped by user IP, with rich metadata (Location, Device, OS).
 - **Geographic Insights**: Seeing where the "readers" are coming from.
 - **High Performance**: Server-side data handling for a snappy admin experience.
 
@@ -107,5 +109,29 @@ Open [http://localhost:3000](http://localhost:3000) to start the journey.
 
 For deeper technical dives, see the `docs/` folder:
 - [System Overview](docs/OVERVIEW.md)
-- [RAG Architecture](docs/rag-system.md)
-- [Admin Dashboard](docs/ADMIN_DASHBOARD.md)
+- [AI Story Advisor](docs/AI_STORY_ADVISOR.md) (Architecture & Features)
+- [Chatbot Implementation](docs/CHATBOT_IMPLEMENTATION.md) (Client/Server Deep Dive)
+- [RAG Flows](docs/RAG_FLOWS.md) (Data Diagrams)
+- [Admin Dashboard](docs/ADMIN_DASHBOARD.md) (Management & Analytics)
+- [RAG Concepts](docs/rag-concepts.md) (Hybrid Search Theory)
+
+---
+
+## 🔮 Future Roadmap
+
+Here are some ideas for future enhancements to take the Storybook CV to the next level:
+
+### AI & RAG
+- [ ] **Voice Interface**: Specialized speech-to-text to talk to the advisor.
+- [ ] **Multi-modal Support**: Allow the user to upload images for the AI to analyze (e.g., "What do you think of this design?").
+- [ ] **Model Switching**: Admin toggle to switch between Gemini, GPT-4, or local LLMs (Ollama) on the fly.
+
+### User Experience
+- [ ] **3D Elements**: Integrate Three.js for immersive chapter backgrounds.
+- [ ] **Gamification**: Add "achievements" for users who explore all chapters.
+- [ ] **Mobile App**: Wrap the experience in a React Native app.
+
+### Admin & Analytics
+- [ ] **Export Data**: CSV/JSON export for chat logs and analytics.
+- [ ] **Session Replay**: Visual replay of how users navigated the site.
+- [ ] **Sentiment Analysis**: Auto-tag user messages as positive/neutral/negative.

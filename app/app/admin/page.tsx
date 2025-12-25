@@ -912,7 +912,11 @@ export default function AdminDashboard() {
                                                                             ? "bg-muted/50"
                                                                             : "bg-primary/5 border border-primary/10"
                                                                     )}>
-                                                                        <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                                                                        <div className="prose prose-sm dark:prose-invert max-w-none break-words [&>p]:mb-0 [&>p]:leading-normal">
+                                                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                                                {msg.content}
+                                                                            </ReactMarkdown>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
