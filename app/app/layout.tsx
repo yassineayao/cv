@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   description: "Interactive Storybook CV of Yassine, a Full-Stack Developer.",
 };
 
+import { SessionRecorder } from "@/components/analytics/SessionRecorder";
 import { VisitTracker } from "@/components/layout/VisitTracker";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 
@@ -22,6 +23,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <VisitTracker />
+          <SessionRecorder />
           {children}
         </ThemeProvider>
       </body>

@@ -1,7 +1,24 @@
+version: '3.8'
+
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: storybook-cv-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: storybook_cv
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - cv-network
+
   qdrant:
     image: qdrant/qdrant:latest
-    container_name: qdrant-db
+    container_name: storybook-cv-qdrant
     restart: always
     ports:
       - "6333:6333" # REST API
@@ -10,3 +27,35 @@ services:
       - QDRANT__SERVICE__GRPC_PORT=6334
     volumes:
       - ./app/qdrant_storage:/qdrant/storage
+    networks:
+      - cv-network
+
+  app:
+    container_name: storybook-cv-app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # Connect to internal postgres service
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/storybook_cv
+      # Connect to internal qdrant service
+      - QDRANT_URL=http://qdrant:6333
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_TRUST_HOST=true
+      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
+    depends_on:
+      - postgres
+      - qdrant
+    networks:
+      - cv-network
+
+volumes:
+  postgres_data:
+
+
+networks:
+  cv-network:
+    driver: bridge

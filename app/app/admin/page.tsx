@@ -25,7 +25,8 @@ import {
     Monitor,
     Globe,
     Clock,
-    Smartphone
+    Smartphone,
+    Film
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -344,26 +345,33 @@ export default function AdminDashboard() {
     const paginatedSources = sources.slice((knowledgePage - 1) * itemsPerPage, knowledgePage * itemsPerPage);
 
     return (
-        <div className="min-h-screen bg-background p-6 font-sans relative">
-            <div className="max-w-6xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-2 transition-colors">
-                            <ArrowLeft className="w-4 h-4 mr-1" /> Back to Portfolio
-                        </Link>
-                        <h1 className="text-3xl font-bold flex items-center gap-3">
-                            <DatabaseZap className="text-primary w-8 h-8" />
-                            Admin Dashboard
-                        </h1>
-                    </div>
-                    <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
-                        <div className="bg-muted/50 p-1 rounded-lg flex gap-1 mr-2 border border-border/50">
+        <div className="min-h-screen bg-background font-sans relative">
+            <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+                <div className="max-w-6xl mx-auto px-6 py-4">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+                        {/* 1. Brand & Back Nav */}
+                        <div className="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
+                            <Link href="/" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                Portfolio
+                            </Link>
+                            <div className="h-6 w-px bg-border/50 hidden lg:block" />
+                            <h1 className="text-xl font-bold flex items-center gap-2">
+                                <DatabaseZap className="text-primary w-6 h-6" />
+                                <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                                    Admin Dashboard
+                                </span>
+                            </h1>
+                            {/* Mobile Logout could go here but let's keep it simple */}
+                        </div>
+
+                        {/* 2. Central Tab Navigation */}
+                        <div className="flex items-center p-1 bg-muted/40 rounded-lg border border-border/40 w-full lg:w-auto justify-center">
                             <Button
                                 variant={activeTab === 'knowledge' ? 'default' : 'ghost'}
                                 size="sm"
                                 className={cn(
-                                    "h-8 text-xs font-bold transition-all",
+                                    "text-xs font-bold transition-all px-4 lg:px-6",
                                     activeTab === 'knowledge' ? "shadow-sm" : "text-muted-foreground hover:text-foreground"
                                 )}
                                 onClick={() => setActiveTab('knowledge')}
@@ -374,7 +382,7 @@ export default function AdminDashboard() {
                                 variant={activeTab === 'analytics' ? 'default' : 'ghost'}
                                 size="sm"
                                 className={cn(
-                                    "h-8 text-xs font-bold transition-all",
+                                    "text-xs font-bold transition-all px-4 lg:px-6",
                                     activeTab === 'analytics' ? "shadow-sm" : "text-muted-foreground hover:text-foreground"
                                 )}
                                 onClick={() => setActiveTab('analytics')}
@@ -385,7 +393,7 @@ export default function AdminDashboard() {
                                 variant={activeTab === 'chats' ? 'default' : 'ghost'}
                                 size="sm"
                                 className={cn(
-                                    "h-8 text-xs font-bold transition-all",
+                                    "text-xs font-bold transition-all px-4 lg:px-6",
                                     activeTab === 'chats' ? "shadow-sm" : "text-muted-foreground hover:text-foreground"
                                 )}
                                 onClick={() => setActiveTab('chats')}
@@ -394,63 +402,121 @@ export default function AdminDashboard() {
                             </Button>
                         </div>
 
-                        {activeTab === 'knowledge' && (
-                            <>
-                                <input
-                                    type="file"
-                                    id="file-upload"
-                                    className="hidden"
-                                    accept=".md,.txt"
-                                    onChange={handleFileUpload}
-                                    disabled={!!actionLoading}
-                                />
-                                <Button
-                                    variant="outline"
-                                    onClick={() => document.getElementById('file-upload')?.click()}
-                                    disabled={!!actionLoading}
-                                    className="flex-1 sm:flex-none border-primary/40 bg-primary/5 hover:bg-primary/20 transition-all font-bold"
-                                >
-                                    {actionLoading === 'upload' ? (
-                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin text-primary" />
-                                    ) : (
-                                        <Plus className="w-4 h-4 mr-2 text-primary" />
-                                    )}
-                                    Upload File
-                                </Button>
-                                <Button
-                                    onClick={() => handleAction('ingest-all')}
-                                    disabled={!!actionLoading || loading}
-                                    className="shadow-glow-primary flex-1 sm:flex-none"
-                                >
-                                    {actionLoading === 'ingest-all' ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-                                    Sync All
-                                </Button>
-                            </>
-                        )}
-
-                        {activeTab === 'analytics' && (
+                        {/* 3. Global Actions */}
+                        <div className="hidden lg:flex items-center gap-2">
                             <Button
-                                variant="secondary"
-                                onClick={() => fetchAnalytics(1)}
-                                disabled={analyticsLoading}
-                                className="flex-1 sm:flex-none bg-primary/20 text-foreground hover:bg-primary/30 border border-primary/30 font-bold transition-all shadow-glow-primary/20"
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleLogout}
+                                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                title="Log Out"
                             >
-                                <RefreshCw className={cn("w-4 h-4 mr-2 text-primary", analyticsLoading && "animate-spin")} />
-                                Refresh Status
+                                <LogOut className="w-5 h-5" />
                             </Button>
-                        )}
+                        </div>
+                    </div>
 
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleLogout}
-                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                            title="Log Out"
-                        >
-                            <LogOut className="w-5 h-5" />
-                        </Button>
+                    {/* 4. Contextual Toolbar */}
+                    <div className="mt-4 pt-4 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-2 self-start sm:self-center">
+                            <Badge variant="outline" className="bg-background/50 backdrop-blur text-muted-foreground shadow-sm py-1.5 px-3">
+                                {activeTab === 'knowledge' && (
+                                    <span className="flex items-center gap-2">
+                                        <Database className="w-3.5 h-3.5" /> Knowledge Base Management
+                                    </span>
+                                )}
+                                {activeTab === 'analytics' && (
+                                    <span className="flex items-center gap-2">
+                                        <Monitor className="w-3.5 h-3.5" /> Traffic & Session Replay
+                                    </span>
+                                )}
+                                {activeTab === 'chats' && (
+                                    <span className="flex items-center gap-2">
+                                        <MessageSquare className="w-3.5 h-3.5" /> AI Interaction Logs
+                                    </span>
+                                )}
+                            </Badge>
+                        </div>
+
+                        <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+                            {activeTab === 'knowledge' && (
+                                <>
+                                    <input
+                                        type="file"
+                                        id="file-upload"
+                                        className="hidden"
+                                        accept=".md,.txt"
+                                        onChange={handleFileUpload}
+                                        disabled={!!actionLoading}
+                                    />
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => document.getElementById('file-upload')?.click()}
+                                        disabled={!!actionLoading}
+                                        size="sm"
+                                        className="h-9 font-semibold border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 transition-all"
+                                    >
+                                        {actionLoading === 'upload' ? (
+                                            <RefreshCw className="w-4 h-4 mr-2 animate-spin text-primary" />
+                                        ) : (
+                                            <Plus className="w-4 h-4 mr-2 text-primary" />
+                                        )}
+                                        Upload File
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleAction('ingest-all')}
+                                        disabled={!!actionLoading || loading}
+                                        size="sm"
+                                        className="h-9 font-semibold shadow-glow-primary"
+                                    >
+                                        {actionLoading === 'ingest-all' ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                                        Sync All
+                                    </Button>
+                                </>
+                            )}
+
+                            {activeTab === 'analytics' && (
+                                <>
+                                    <Link href="/admin/analytics/recordings">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-9 font-semibold border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 transition-all"
+                                        >
+                                            <Film className="w-4 h-4 mr-2 text-primary" />
+                                            Session Recordings
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => fetchAnalytics(1)}
+                                        disabled={analyticsLoading}
+                                        size="sm"
+                                        className="h-9 font-semibold bg-secondary/50 hover:bg-secondary/70 border border-border/50"
+                                    >
+                                        <RefreshCw className={cn("w-4 h-4 mr-2 text-primary", analyticsLoading && "animate-spin")} />
+                                        Refresh
+                                    </Button>
+                                </>
+                            )}
+                            {activeTab === 'chats' && (
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => fetchChatLogs(1)}
+                                    disabled={chatsLoading}
+                                    size="sm"
+                                    className="h-9 font-semibold bg-secondary/50 hover:bg-secondary/70 border border-border/50"
+                                >
+                                    <RefreshCw className={cn("w-4 h-4 mr-2 text-primary", chatsLoading && "animate-spin")} />
+                                    Refresh Logs
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
+            </header>
+
+            <main className="max-w-6xl mx-auto p-6 space-y-8">
 
                 {/* Info Bar */}
                 <AnimatePresence>
@@ -937,7 +1003,7 @@ export default function AdminDashboard() {
                         Files are automatically pulled from the <code className="bg-muted px-1.5 py-0.5 rounded">public/knowledge/</code> folder for ingestion.
                     </p>
                 </div>
-            </div>
+            </main>
 
             {/* Preview Modal */}
             <AnimatePresence>

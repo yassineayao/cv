@@ -30,10 +30,20 @@ A comprehensive system to monitor user interactions with the AI Chatbot:
 - **Session History**: Click on any user to expand their full list of chat sessions and read conversation transcripts with accurate timestamps.
 - **Global Search**: Filter conversations by User IP, Location, or Message Content to find specific interactions.
 
-### 4. Global Theme Consistency
+### 4. Session Replay
+A powerful tool to visualize user interactions:
+- **Visual Playback**: Replay user sessions as if you were watching their screen.
+- **Event Timeline**: See clicks, scrolls, and navigation events in real-time.
+- **Metadata**: view user path, duration, and device information for each recording.
+- **Privacy Focused**: Admin paths are automatically excluded from recording.
+
+### 5. Global Theme Consistency
 The dashboard (and the login page) are fully synchronized with the portfolio's theme:
 - **Theme Sync**: Uses a global `ThemeProvider` to ensure your preference (Light/Dark) persists across navigation and page refreshes.
+- **Sticky Header**: A glassmorphism header stays at the top of the viewport for easy access to navigation.
+- **Contextual Actions**: Toolkit changes dynamically based on the active tab (Knowledge, Analytics, etc.).
 - **High Contrast UI**: Action buttons and tabs are optimized for maximum visibility in both theme modes.
+
 
 ## 🔄 Workflow: Adding New Knowledge
 1. **Direct Upload**:

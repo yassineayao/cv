@@ -100,3 +100,31 @@ model ChatMessage {
   session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   sessionId String
 }
+
+model SessionRecording {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Link to a Visit if possible, otherwise just keep generic metadata
+  // We can replicate some Visit metadata here for easier querying of recordings
+  visitId   String?  // Optional link to Visit model if you want strict relation, or loosely coupled
+  
+  // Metadata for filtering
+  userId    String?
+  path      String? 
+  duration  Int?     // Duration in seconds (optional, updated on finish)
+  
+  events    SessionEventChunk[]
+}
+
+model SessionEventChunk {
+  id          String           @id @default(cuid())
+  createdAt   DateTime         @default(now())
+  
+  recording   SessionRecording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  recordingId String
+  
+  sequence    BigInt           // To order chunks
+  events      String           @db.Text // JSON string of the events chunk
+}

@@ -31,6 +31,7 @@ An intelligent chatbot integrated into the experience.
 A internal command center for tracking engagement.
 - **Real-time Analytics**: Insights into how visitors interact with the story.
 - **Chat Logs**: Full conversation history grouped by user IP, with rich metadata (Location, Device, OS).
+- **Session Replay**: Visual playback of user sessions to understand user behavior and identify issues.
 - **Geographic Insights**: Seeing where the "readers" are coming from.
 - **High Performance**: Server-side data handling for a snappy admin experience.
 
@@ -81,24 +82,16 @@ A internal command center for tracking engagement.
 
 ### Setup
 
-1. **Start Infrastructure**:
+1. **Start Application**:
+   From the project root:
    ```bash
-   docker-compose up -d
+   docker compose up --build -d
    ```
+   *This starts the full stack: Database, Vector DB, and the Next.js Application.*
 
-2. **Install Dependencies**:
-   ```bash
-   cd app && bun install
-   ```
-
-3. **Ingest Knowledge Base** (for the AI Advisor):
+2. **Ingest Knowledge Base** (First time only):
    ```bash
    bun scripts/ingest-kb.ts
-   ```
-
-4. **Run Development Server**:
-   ```bash
-   bun dev
    ```
 
 Open [http://localhost:3000](http://localhost:3000) to start the journey.
@@ -113,6 +106,7 @@ For deeper technical dives, see the `docs/` folder:
 - [Chatbot Implementation](docs/CHATBOT_IMPLEMENTATION.md) (Client/Server Deep Dive)
 - [RAG Flows](docs/RAG_FLOWS.md) (Data Diagrams)
 - [Admin Dashboard](docs/ADMIN_DASHBOARD.md) (Management & Analytics)
+- [Session Replay](docs/SESSION_REPLAY.md) (Recording & Playback)
 - [RAG Concepts](docs/rag-concepts.md) (Hybrid Search Theory)
 
 ---
@@ -133,5 +127,5 @@ Here are some ideas for future enhancements to take the Storybook CV to the next
 
 ### Admin & Analytics
 - [ ] **Export Data**: CSV/JSON export for chat logs and analytics.
-- [ ] **Session Replay**: Visual replay of how users navigated the site.
+- [x] **Session Replay**: Visual replay of how users navigated the site.
 - [ ] **Sentiment Analysis**: Auto-tag user messages as positive/neutral/negative.

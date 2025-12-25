@@ -1,6 +1,7 @@
 # Use the official Bun image
 # See all versions at https://hub.docker.com/r/oven/bun/tags
 FROM oven/bun:1-alpine AS base
+RUN apk add --no-cache openssl
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -20,7 +21,7 @@ COPY . .
 RUN bunx prisma generate
 
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV GOOGLE_GENERATIVE_AI_API_KEY="AIzaSyCvDAirpAuH7Sf5SAnCAZC-Rtdm-LImTAQ"
+ENV GOOGLE_GENERATIVE_AI_API_KEY="AIzaSyDgvUMKICn9e69j9VGOW-WtroATK1Mh3jg"
 
 RUN bun run build
 
@@ -28,7 +29,6 @@ RUN bun run build
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
