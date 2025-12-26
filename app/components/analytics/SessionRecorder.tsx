@@ -3,7 +3,10 @@
 import { useEffect, useRef } from "react";
 import { record } from "rrweb";
 
+import { usePathname } from "next/navigation";
+
 export function SessionRecorder() {
+    const pathname = usePathname();
     const eventsRef = useRef<any[]>([]);
     const recordingIdRef = useRef<string | null>(null);
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -14,9 +17,14 @@ export function SessionRecorder() {
             emit(event) {
                 eventsRef.current.push(event);
             },
+            recordCanvas: false,
+            sampling: {
+                mousemove: 50,
+                scroll: 150,
+            },
             // optional configs
-            checkoutEveryNth: 100, // Checkout to reduce memory usage on long sessions? No, rrweb doesn't support this easily for playback.
-            // masking logic can go here
+            checkoutEveryNth: 100,
+            maskAllInputs: true,
         });
 
         // Initialize recording session
@@ -64,8 +72,15 @@ export function SessionRecorder() {
             }
         }, 5000); // 5 seconds
 
+        // Limit session duration (hard stop after 4 mins)
+        const hardStopTimeout = setTimeout(() => {
+            if (stopFn) stopFn();
+            console.log("Recording stopped due to time limit");
+        }, 4 * 60 * 1000);
+
         return () => {
             if (stopFn) stopFn();
+            clearTimeout(hardStopTimeout);
             if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
 
             // Try to flush remaining events
@@ -77,7 +92,7 @@ export function SessionRecorder() {
                 );
             }
         };
-    }, []);
+    }, [pathname]); // Restart on path change
 
     return null;
 }

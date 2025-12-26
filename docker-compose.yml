@@ -32,9 +32,13 @@ services:
 
   app:
     container_name: storybook-cv-app
+    env_file:
+      - ./app/.env
     build:
       context: ./app
       dockerfile: Dockerfile
+      args:
+        - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
     restart: always
     ports:
       - "3000:3000"
@@ -43,9 +47,7 @@ services:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/storybook_cv
       # Connect to internal qdrant service
       - QDRANT_URL=http://qdrant:6333
-      - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_TRUST_HOST=true
-      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
     depends_on:
       - postgres
       - qdrant

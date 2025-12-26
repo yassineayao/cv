@@ -145,3 +145,6 @@ out/
 
 qdrant_storage
 memo
+
+build.sh
+export-recordings.ts
