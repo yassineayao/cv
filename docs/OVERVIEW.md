@@ -289,7 +289,7 @@ If you want to see my quests in action or reach me for collaboration:
 **Illustration:** A floating, ancient scroll that contains the knowledge of all previous chapters.
 
 > [!TIP]
-> **Complete Documentation**: Check out the [AI Story Advisor Guide](./AI_STORY_ADVISOR.md) for architecture, [RAG Flows](./RAG_FLOWS.md) for data diagrams, and [Use Cases](./USE_CASES.md) for interaction examples.
+> **Complete Documentation**: Check out the [AI Story Advisor Guide](./AI_STORY_ADVISOR.md) for architecture, [RAG Flows](./RAG_FLOWS.md) for data diagrams, [Use Cases](./USE_CASES.md) for interaction examples, and the [Deployment Guide](./DEPLOYMENT.md) for operations.
 
 **Text:**
 ```

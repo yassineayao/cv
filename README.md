@@ -82,17 +82,23 @@ A internal command center for tracking engagement.
 
 ### Setup
 
-1. **Start Application**:
+1. **Configure Environment**:
+   Create a `.env` file in the `app/` directory (see the [Deployment Guide](docs/DEPLOYMENT.md) for required variables).
+
+2. **Start Application**:
    From the project root:
    ```bash
    docker compose up --build -d
    ```
    *This starts the full stack: Database, Vector DB, and the Next.js Application.*
 
-2. **Ingest Knowledge Base** (First time only):
+3. **Ingest Knowledge Base** (First time only):
    ```bash
-   bun scripts/ingest-kb.ts
+   docker exec -it storybook-cv-app bun scripts/ingest-kb.ts
    ```
+
+> [!NOTE]
+> Database initialization is automated. The container runs `npx prisma db push` on startup. If it fails due to potential data loss, you will see a warning in the logs and can handle it manually.
 
 Open [http://localhost:3000](http://localhost:3000) to start the journey.
 
@@ -102,6 +108,7 @@ Open [http://localhost:3000](http://localhost:3000) to start the journey.
 
 For deeper technical dives, see the `docs/` folder:
 - [System Overview](docs/OVERVIEW.md)
+- [Deployment Guide](docs/DEPLOYMENT.md) (Docker & Database Operations)
 - [AI Story Advisor](docs/AI_STORY_ADVISOR.md) (Architecture & Features)
 - [Chatbot Implementation](docs/CHATBOT_IMPLEMENTATION.md) (Client/Server Deep Dive)
 - [RAG Flows](docs/RAG_FLOWS.md) (Data Diagrams)
